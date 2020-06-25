@@ -1,0 +1,37 @@
+Package: WikiCitationHistoRy
+Title: a library to parse wikipedia article history content
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Jonathan",
+           family = "Sobel",
+           role = c("aut", "cre"),
+           email = "jsobel83@gmail.com",
+           comment = c(ORCID = "0000-0002-5111-4070"))
+Description: WikiCitationHistoRy is a library that allows to parse english wikipedia article history and extract references of any kind, such as doi, website, news,isbn and more.
+License: CC BY-NC
+Encoding: UTF-8
+LazyData: true
+Imports:
+	XML,
+	dplyr,
+	reshape,
+	textreuse,
+	xlsx,
+	lubridate,
+	httr,
+	rJava,
+	WikipediR,
+	jsonlite,
+	curl,
+	lubridate,
+	ggplot2,
+	scales,
+	gridExtra,
+	rcrossref,
+	timevis,
+	ggridges,
+	reshape2,
+	stringr,
+	europepmc,
+	textclean
+RoxygenNote: 7.1.0
