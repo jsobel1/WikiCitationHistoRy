@@ -6,6 +6,7 @@
 #'
 #'
 #' @param article_name Path to the input file
+#' @param date_an input date to select most recent version
 #' @return A table with all revisions of the wikipedia article
 #' @export
 #'
@@ -13,12 +14,12 @@
 #' Zeitgeber_history=get_article_full_history_table("Zeitgeber")
 
 
-get_article_full_history_table=function(article_name){
+get_article_full_history_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
   what="ids|timestamp|comment|user|userid|size|content" #|parsedcomment|tags|flags
 
   article_name_c=gsub(" ","%20",article_name)
   output_table=c()
-  cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=revisions&rvprop=",what,"&rvstart=01012001&rvdir=newer&format=json&rvlimit=max",sep="")
+  cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=revisions&rvprop=",what,"&rvstart=01012001&rvdir=newer&rvend=",date_an,"&format=json&rvlimit=max",sep="")
   resp=GET(cmd)
   parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
   tt=paste("parsed$query$pages$'",names(parsed$query$pages)[1],"'$revisions",sep="")
@@ -31,7 +32,7 @@ get_article_full_history_table=function(article_name){
     output_table_load=c()
     print(parsed$continue$rvcontinue)
     rvc=parsed$continue$rvcontinue
-    cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=revisions&rvprop=",what,"&rvstart=01012001&rvdir=newer&format=json&rvlimit=max&rvcontinue=",rvc,sep="")
+    cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=revisions&rvprop=",what,"&rvstart=01012001&rvdir=newer&rvend=",date_an,"&format=json&rvlimit=max&rvcontinue=",rvc,sep="")
     resp=GET(cmd)
     parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
     tt2=paste("parsed$query$pages$'",names(parsed$query$pages)[1],"'$revisions",sep="")
@@ -89,19 +90,20 @@ get_article_initial_table=function(article_name){
 #'
 #'
 #' @param article_name Path to the input file
+#' @param date_an input date to select most recent version
 #' @return A table with the initial revision of the wikipedia article
 #' @export
 #'
 #' @examples
 #' get_article_info_table("Zeitgeber")
 
-get_article_info_table=function(article_name){
+get_article_info_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
   #article_name="Zeitgeber"
   what="pageid|title|length" #|parsedcomment|tags|flags
   #api.php?action=query&titles=Albert%20Einstein&prop=info&inprop=url|talkid
   article_name_c=gsub(" ","%20",article_name)
   output_table=c()
-  cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=info&inprop=",what,"&format=json",sep="")
+  cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=info&inprop=",what,"&rvstart=",date_an,"&rvdir=older&format=json",sep="")
   resp=GET(cmd)
   parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
   tt=paste("parsed$query$pages$'",names(parsed$query$pages)[1],"'",sep="")
@@ -121,6 +123,7 @@ get_article_info_table=function(article_name){
 #'
 #'
 #' @param article_name Path to the input file
+#' @param date_an input date to select most recent version
 #' @return A table with the last revision of the wikipedia article
 #' @export
 #'
@@ -128,12 +131,12 @@ get_article_info_table=function(article_name){
 #' get_article_most_recent_table("Zeitgeber")
 
 
-get_article_most_recent_table=function(article_name){
+get_article_most_recent_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
   what="ids|timestamp|comment|user|userid|size|content" #|parsedcomment|tags|flags
 
   article_name_c=gsub(" ","%20",article_name)
   output_table=c()
-  cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=revisions&rvprop=",what,"&rvend=05072019&rvdir=older&format=json&rvlimit=1",sep="")
+  cmd=paste("https://en.wikipedia.org/w/api.php?action=query&titles=",article_name_c,"&prop=revisions&rvprop=",what,"&rvstart=",date_an,"&rvdir=older&format=json&rvlimit=1",sep="")
   resp=GET(cmd)
   parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
   tt=paste("parsed$query$pages$'",names(parsed$query$pages)[1],"'$revisions",sep="")
@@ -249,8 +252,8 @@ get_category_articles_creation=function(list_art){
 #' unique(unlist(sapply(category_list,get_pagename_in_cat)))
 #'
 
-get_pagename_in_cat=function(category){
-  cats2=pages_in_category("en", "wikipedia", categories =category,limit = 3000) # "Circadian rhythm"
+get_pagename_in_cat=function(category){try({
+  cats2=pages_in_category("en", "wikipedia", categories =category,limit = 500) # "Circadian rhythm"
 
   art_of_int=c()
 
@@ -264,7 +267,7 @@ get_pagename_in_cat=function(category){
   }
 
   return(unlist(art_of_int))
-
+})
 }
 
 
@@ -294,11 +297,14 @@ book_regexp='\\{\\{cite book .*?\\}\\}'
 
 pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
 
-ref_regexp='<ref>\\{\\{[c|C]ite.*?\\}\\}</ref>' # in-text refs!
+ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
 
 cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
 
 wikihyperlink_regexp='\\[\\[.*?\\]\\]'
+
+template_regexp='\\{\\{pp.*?\\}\\}'
+
 
 regexp_list=c(
   doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+", #Good enough
@@ -329,9 +335,11 @@ regexp_list=c(
 
   pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}",
 
-  ref_regexp='<ref>\\{\\{[c|C]ite.*?\\}\\}</ref>', # in-text refs!
+  ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>', # in-text refs!
 
-  cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
+  cite_regexp='\\{\\{[c|C]ite.*?\\}\\}',
+
+  template_regexp='\\{\\{pp.*?\\}\\}'
 )
 
 
@@ -368,7 +376,7 @@ regexp_list=c(
 #'
 #' pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
 #'
-#' ref_regexp='<ref>\\{\\{[c|C]ite.*?\\}\\}</ref>' # in-text refs!
+#' ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
 #'
 #' cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
 #'
@@ -409,7 +417,6 @@ return(df_citation_revid_art)
 #' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
 #' annotate_doi_list_europmc(dois_fetched)
 
-
 annotate_doi_list_europmc=function(doi_list){
   annotated_doi_df=c()
   for(i in 1:length(doi_list)){ #
@@ -419,6 +426,19 @@ annotate_doi_list_europmc=function(doi_list){
     if(is.null(annotated_dois_df_load)){annotated_dois_df_load=tryCatch(epmc_search(doi_list[i]),error = function(e) NULL)}
     if(is.null(annotated_dois_df_load)){next}
     if(dim(annotated_dois_df_load)[1]==1){
+      annotated_dois_df_load=dplyr::mutate(annotated_dois_df_load, id = if (exists('id', where = annotated_dois_df_load)) id else NA,
+                                           source = if (exists('source', where = annotated_dois_df_load)) source else NA,
+                                           pmid = if (exists('pmid', where = annotated_dois_df_load)) pmid else NA,
+                                           pmcid = if (exists('pmcid', where = annotated_dois_df_load)) pmcid else NA,
+                                           doi = if (exists('doi', where = annotated_dois_df_load)) doi else NA,
+                                           title = if (exists('title', where = annotated_dois_df_load)) title else NA,
+                                           authorString = if (exists('authorString', where = annotated_dois_df_load)) authorString else NA,
+                                           journalTitle = if (exists('journalTitle', where = annotated_dois_df_load)) journalTitle else NA,
+                                           pubYear = if (exists('pubYear', where = annotated_dois_df_load)) pubYear else NA,
+                                           pubType = if (exists('pubType', where = annotated_dois_df_load)) pubType else NA,
+                                           isOpenAccess = if (exists('isOpenAccess', where = annotated_dois_df_load)) isOpenAccess else NA,
+                                           citedByCount = if (exists('citedByCount', where = annotated_dois_df_load)) citedByCount else NA,
+                                           firstPublicationDate = if (exists('firstPublicationDate', where = annotated_dois_df_load)) firstPublicationDate else NA)
       annotated_dois_df_load=tryCatch(dplyr::select(annotated_dois_df_load,id,source,pmid,pmcid,doi,title,
                                                     authorString,journalTitle,pubYear,pubType,isOpenAccess,citedByCount,
                                                     firstPublicationDate),error = function(e) NULL)
@@ -429,6 +449,7 @@ annotate_doi_list_europmc=function(doi_list){
   return(data.frame(annotated_doi_df))
 
 }
+
 
 #' Annotate DOI List with CrossRef
 #'
@@ -582,7 +603,7 @@ replace_wikihypelinks=function(art_text){
 
 
 parse_article_ALL_citations=function(art_text){
-
+#art_text=art_test
   get_cite=as.character(sapply(extract_citations(art_text),replace_wikihypelinks))
   cite_types=sapply(get_cite,parse_cite_type)
   get_cite=gsub("\\{\\{[c|C]ite","",as.character(get_cite))
@@ -592,8 +613,8 @@ parse_article_ALL_citations=function(art_text){
 
   get_cite_subfield=sapply(get_cite, function(x) unlist(strsplit(x,"\\|"))[2:length(unlist(strsplit(x,"\\|")))])
 
-  df_out=data.frame(type=rep(cite_types,lapply(get_cite_subfield,length)),id_cite=rep(1:length(get_cite),lapply(get_cite_subfield,length)),
-                    colsplit(string=unlist(get_cite_subfield), pattern="=", names=c("variable", "value")))
+  df_out=data.frame(type=rep(as.character(unlist(cite_types)),lapply(get_cite_subfield,length)),id_cite=rep(1:length(get_cite),lapply(get_cite_subfield,length)),
+                    reshape2::colsplit(string=unlist(get_cite_subfield), pattern="=", names=c("variable", "value")))
 
   df_out$variable=gsub(" ","",df_out$variable)
 
@@ -604,7 +625,7 @@ parse_article_ALL_citations=function(art_text){
 #' Get SciScore from wikipedia article content
 #'
 #' This function get a wikipedia article content
-#' and return SciScore
+#' and return SciScore from citation template journal citation over all citations
 #'
 #' @param art_text text content of wikipedia article
 #' @return SciScore
@@ -648,12 +669,40 @@ get_refCount=function(art_text){
   return(as.numeric(as.character(ref_count)))
 }
 
+#' Get urlCount from wikipedia article content
+#'
+#' This function get a wikipedia article content
+#' and return urlCount
+#'
+#' @param art_text text content of wikipedia article
+#' @return urlCount
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' get_urlCount(art_test[9])
+#'
+
 get_urlCount=function(art_text){
   ref_regexp=url_regexp
   ref_fetched=str_match_all(art_text, ref_regexp)
   ref_count=length(as.character(unlist(ref_fetched)))
   return(as.numeric(as.character(ref_count)))
 }
+
+#' Get hyperlinkCount from wikipedia article content
+#'
+#' This function get a wikipedia article content
+#' and return hyperlinkCount
+#'
+#' @param art_text text content of wikipedia article
+#' @return hyperlinkCount
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' get_hyperlinkCount(art_test[9])
+#'
 
 get_hyperlinkCount=function(art_text){
   ref_regexp='\\[\\[.*?\\]\\]'
@@ -662,7 +711,6 @@ get_hyperlinkCount=function(art_text){
   return(as.numeric(as.character(ref_count)))
 }
 
-#regexp_list
 
 #' Get DOI Count from wikipedia article content
 #'
@@ -944,8 +992,11 @@ annotate_isbn_google=function(isbn_nb){
 annotate_doi_list_altmetrics=function(doi_list){
   alm <- function(x)  tryCatch(altmetrics(doi = x) %>% altmetric_data(), error=function(e) NULL)
   results <- pmap_df(doi_list, alm)
+  results=dplyr::select(results,title,doi,pmid,altmetric_jid,issns,journal,authors1,type,altmetric_id,is_oa,cited_by_fbwalls_count,cited_by_posts_count,cited_by_tweeters_count,cited_by_videos_count,cited_by_feeds_count,cited_by_accounts_count,score ,published_on,added_on,url)
+
   return(results)
 }
+##anno_dois_altmetrics=annotate_doi_list_altmetrics(list(unique(as.character(doi_30K[1:200,1]))))
 
 annotate_isbn_list_altmetrics=function(isbn_list){
   alm <- function(x)  tryCatch(altmetrics(isbn = x) %>% altmetric_data(), error=function(e) NULL)
@@ -1005,8 +1056,8 @@ get_citation_type=function(article_most_recent_table){
 
   get_top_cited_wiki_papers=function(df_doi_revid_art){
 
-    top_20_wiki_cited_doi=names(tail(sort(table(unique(df_doi_revid_art)$citation)),40))
-    wikicount=data.frame(tail(sort(table(unique(df_doi_revid_art)$citation)),40))
+    top_20_wiki_cited_doi=names(tail(sort(table(unique(df_doi_revid_art)$citation_fetched)),40))
+    wikicount=data.frame(tail(sort(table(unique(df_doi_revid_art)$citation_fetched)),40))
     colnames(wikicount)=c("citation","wiki_count")
 
     top_20_wiki_cited_doi_annotated=annotate_doi_list_europmc(top_20_wiki_cited_doi)
@@ -1022,10 +1073,213 @@ get_citation_type=function(article_most_recent_table){
 
     #top_20_wiki_cited_doi_annotated= top_20_wiki_cited_doi_annotated%>%dplyr::left_join(top20_cited_in_wiki_art,by=c("citation_fetched"="citation"))
 
-    write.table(top_20_wiki_cited_doi_annotated,"top_20_wiki_cited_doi_annotated_europmc.csv",sep=";",row.names = F)
+    #write.table(top_20_wiki_cited_doi_annotated,"top_20_wiki_cited_doi_annotated_europmc.csv",sep=";",row.names = F)
 
     return(top_20_wiki_cited_doi_annotated)
   }
 
  # get_top_cited_wiki_papers(df_doi_revid_art)
+
+
+  get_tables_initial_most_recent_full_info=function(all_art){
+    #all_art=covid_imp_art
+
+    article_initial_table=c()
+    article_most_recent_table=c()
+    article_info_table=c()
+    article_full_history_table=c()
+
+    for(i in 1:length(all_art)){
+      print(all_art[i])
+      try({
+        article_initial_table=rbind(article_initial_table, get_article_initial_table(all_art[i]))
+        article_most_recent_table=rbind(article_most_recent_table,get_article_most_recent_table(all_art[i]))
+        article_info_table=rbind(article_info_table,get_article_info_table(all_art[i]))
+        article_full_history_table=rbind(article_full_history_table,get_article_full_history_table(all_art[i]))
+      })
+    }
+    return(list(article_initial_table=article_initial_table,article_most_recent_table=article_most_recent_table,article_info_table=article_info_table,article_full_history_table=article_full_history_table))
+  }
+
+
+
+  plot_venn_from_two_list=function(listA,listB,colors_2=c("red", "blue")){
+
+    grid.newpage()
+    venn.plot <- draw.pairwise.venn(
+      length(unlist(listA)),length(unlist(listB)),length(intersect(unlist(listA),unlist(listB))),
+      euler.d = TRUE,
+      sep.dist = 0.03,col=c(NA,NA),
+      rotation.degree = 0,category   = c(names(listA),names(listB)),fill=colors_2,
+      lty             = 1, alpha     = 0.2,cex = rep(3, 3),cat.cex=c(3,3)
+    )
+
+    grid.draw(venn.plot)
+  }
+
+
+  page_view_plot=function(article_name,ymax=NA,start="2020010100",end="2020050100"){
+    page_view=data.frame(article_pageviews(project = "en.wikipedia", article = article_name,start=start,end=end))
+
+    page_view$date=ymd(page_view$date)
+
+    Pl=ggplot(page_view,aes(date,views))+ geom_area(fill="darkgreen")+theme_classic()+ggtitle(paste(article_name, "daily views"))+
+      scale_y_continuous(limits=c(0,ymax),expand=c(0,0))+scale_x_date(limits=c(as.Date(as.POSIXlt("2020010100",format="%Y%m%d%H",ts="GMT")),as.Date(as.POSIXlt("2020050100",format="%Y%m%d%H",ts="GMT"))))
+    print(Pl)
+  }
+
+  page_edit_plot=function(article_name,ymax=NA,start="2020010100",end="2020050100"){
+    history=get_article_full_history_table(article_name)
+    history$ts=as.Date(sapply(history$timestamp,function(x){return(unlist(strsplit(x,"T"))[1])}))
+    df_edits=dplyr::select(history,ts)%>%dplyr::filter(ts>as.Date(as.POSIXlt(start,format="%Y%m%d%H",ts="GMT"))&ts<as.Date(as.POSIXlt(end,format="%Y%m%d%H",ts="GMT"))) #to test
+    df_edits_bin=data.frame(count=as.numeric(table(cut( df_edits$ts, breaks="1 week"))),date=as.Date(names(table(cut( df_edits$ts, breaks="1 week")))))
+    Pl=ggplot(df_edits_bin,aes(date,count))+
+      geom_area(fill="darkred")+theme_classic()+
+      ggtitle(paste(article_name, "weekly edits"))+
+      scale_y_continuous(limits=c(0,ymax),expand=c(0,0))+
+      scale_x_date(limits=c(as.Date(as.POSIXlt(start,format="%Y%m%d%H",ts="GMT")),as.Date(as.POSIXlt(end,format="%Y%m%d%H",ts="GMT"))))
+    print(Pl)
+  }
+
+  padNA <- function (mydata, rowsneeded, first = TRUE)
+  {
+    temp1 = colnames(mydata)
+    rowsneeded = rowsneeded - nrow(mydata)
+    temp2 = setNames(
+      data.frame(matrix(rep(NA, length(temp1) * rowsneeded),
+                        ncol = length(temp1))), temp1)
+    if (isTRUE(first)) rbind(mydata, temp2)
+    else rbind(temp2, mydata)
+  }
+
+  dotnames <- function(...) {
+    vnames <- as.list(substitute(list(...)))[-1L]
+    vnames <- unlist(lapply(vnames,deparse), FALSE, FALSE)
+    vnames
+  }
+
+  Cbind <- function(..., first = TRUE) {
+    Names <- dotnames(...)
+    datalist <- setNames(list(...), Names)
+    nrows <- max(sapply(datalist, function(x)
+      ifelse(is.null(dim(x)), length(x), nrow(x))))
+    datalist <- lapply(seq_along(datalist), function(x) {
+      z <- datalist[[x]]
+      if (is.null(dim(z))) {
+        z <- setNames(data.frame(z), Names[x])
+      } else {
+        if (is.null(colnames(z))) {
+          colnames(z) <- paste(Names[x], sequence(ncol(z)), sep = "_")
+        } else {
+          colnames(z) <- paste(Names[x], colnames(z), sep = "_")
+        }
+      }
+      padNA(z, rowsneeded = nrows, first = first)
+    })
+    do.call(cbind, datalist)
+  }
+
+  # get_anyCount=function(art_text,regexp){
+  #   ref_regexp=regexp
+  #   ref_fetched=str_match_all(art_text, ref_regexp)
+  #   ref_count=length(as.character(unlist(ref_fetched)))
+  #   return(as.numeric(as.character(ref_count)))
+  # }
+  #
+  # regexp_list
+
+  plot_top_source=function(df_cite_parsed_revid_art,source_type){
+
+    #publisher
+    P1=df_cite_parsed_revid_art%>%dplyr::filter(variable==source_type)%>%dplyr::mutate(value=gsub(" ","",value))%>%dplyr::filter(value!="")%>%
+      dplyr::group_by(value)%>%
+      summarise(count=n())%>%arrange(-count)%>%
+      top_n(20)%>%ggplot(aes(reorder(value,count),count))+
+      geom_bar(stat="identity")+coord_flip()+ggtitle(paste("Top 20",source_type))
+    print(P1)
+  }
+
+  plot_distribution_source_type=function(df_cite_count_revid_art){
+    P1=df_cite_count_revid_art%>%dplyr::filter(cite_type %in% c("journal","news","web","book"))%>%dplyr::group_by(revid,cite_type,Freq)%>%
+      ggplot(aes(cite_type,Freq))+ geom_boxplot(width=0.6)+coord_flip() #geom_violin(trim = F)+
+    print(P1)
+  }
+
+
+  get_subcat_table=function(catname,replecement="_"){#catname,depth_cat
+    cat_table=c()
+    catname=gsub("Category:","",catname)
+    catname=gsub(" ",replecement,catname)
+    #api.php?action=query&list=categorymembers&cmtitle=Category:2019-20%20coronavirus%20pandemic&cmsort=timestamp&cmd_r=desc #&cmprop=ids|title|type|timestamp #&cmtype=subcat
+    cmd=paste("https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:",catname,"&cmlimit=5&cmprop=ids|title|type|timestamp&format=json&cmtype=subcat",sep="")
+    resp=GET(cmd)
+    parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
+    cat_table=rbind(cat_table,parsed$query$categorymembers)
+    try({
+      while(length(parsed$continue$cmcontinue)==1){ #&cmtype=subcat
+        rvc=parsed$continue$cmcontinue
+        cmd=paste("https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:",catname,"&cmlimit=5&cmprop=ids|title|type|timestamp&format=json&cmtype=subcat&cmcontinue=",rvc,sep="")
+        resp=GET(cmd)
+        parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
+        cat_table=rbind(cat_table,parsed$query$categorymembers)
+      }
+    })
+    cat_table$parent_cat=rep(paste("Category:",catname,sep=""),dim(cat_table)[1])
+    return(cat_table)
+  }
+
+  #test=get_subcat_table("Category:Impact of the COVID-19 pandemic on sports")
+
+  get_pages_in_cat_table=function(catname,replecement="_"){#catname,depth_cat
+    cat_table=c()
+    catname=gsub("Category:","",catname)
+    catname=gsub(" ",replecement,catname)
+    #api.php?action=query&list=categorymembers&cmtitle=Category:2019-20%20coronavirus%20pandemic&cmsort=timestamp&cmd_r=desc #&cmprop=ids|title|type|timestamp #&cmtype=subcat
+    cmd=paste("https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:",catname,"&cmlimit=5&cmprop=ids|title|type|timestamp&format=json&cmtype=page",sep="")
+    resp=GET(cmd)
+    parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
+    cat_table=rbind(cat_table,parsed$query$categorymembers)
+    try({
+      while(length(parsed$continue$cmcontinue)==1){ #&cmtype=subcat
+        rvc=parsed$continue$cmcontinue
+        cmd=paste("https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:",catname,"&cmlimit=5&cmprop=ids|title|type|timestamp&format=json&cmtype=page&cmcontinue=",rvc,sep="")
+        resp=GET(cmd)
+        parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
+        cat_table=rbind(cat_table,parsed$query$categorymembers)
+      }
+    })
+    cat_table$parent_cat=rep(paste("Category:",catname,sep=""),dim(cat_table)[1])
+    return(cat_table)
+  }
+
+  get_subcat_multiple=function(catlist,replecement="_"){
+    cat_table_list=c()
+    for(i in 1:length(catlist)){
+      try({
+        cat_table_list=rbind(cat_table_list,get_subcat_table(catlist[i],replecement))
+      }, silent = TRUE)
+    }
+    return(cat_table_list)
+  }
+
+  get_subcat_multiple(test$title)
+
+  get_page_in_cat_multiple=function(catlist,replecement="_"){
+    cat_table_list=c()
+    for(i in 1:length(catlist)){
+      try({
+        cat_table_list=rbind(cat_table_list,get_pages_in_cat_table(catlist[i],replecement))
+      }, silent = TRUE)
+    }
+    return(cat_table_list)
+  }
+
+  get_subcat_with_depth=function(catname,depth,replecement="_"){
+    table_out=get_subcat_table(catname)
+    while(depth>0){
+      table_out=rbind(table_out,get_subcat_multiple(table_out$title,replecement))
+      depth=depth-1
+    }
+    return(unique(table_out))
+  }
 
