@@ -150,12 +150,12 @@ get_article_most_recent_table=function(article_name,date_an="2020-05-01T00:00:00
 
 #' Write Article Table to an xlsx
 #'
-#' This function get a wikipedia article table as input and the name of the target xls file
-#'
+#' This function get a wikipedia article table as input and the name of the target xls file.
+#' an xlsx with the table is written in the working directory.
 #'
 #' @param wiki_hist wiki history table
 #' @param file_name output file name prefix
-#' @return A table with the last revision of the wikipedia article
+#' @return nothing
 #' @export
 #'
 #' @examples
@@ -190,7 +190,6 @@ write_wiki_history_to_xlsx=function(wiki_hist,file_name){
 #' Category_articles_history=get_category_articles_history(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
 #'
 
-
 get_category_articles_history=function(list_art){
   dfn_art=c()
   for(art in 1:length(list_art)){
@@ -218,7 +217,7 @@ get_category_articles_history=function(list_art){
 #'
 #' @examples
 #'
-#' get_category_articles_history=get_category_articles_creation(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+#' category_articles_history=get_category_articles_creation(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
 #'
 
 get_category_articles_creation=function(list_art){
@@ -228,6 +227,36 @@ get_category_articles_creation=function(list_art){
     print(list_art[art])
     dfn_load=try(get_article_initial_table(list_art[art]))
     #dfn_load$user=rep(user_of_int[art],dim(dfn_load)[1])
+    if(length(dfn_load)>1){
+      dfn_art=rbind(dfn_art,dfn_load)
+    }
+
+  }
+  return(dfn_art)
+}
+
+
+#' Get Category Articles most recent
+#'
+#' This function get a list of wikipedia article titles as input
+#' and create a wipipedia articles most recent table
+#'
+#' @param list_art list of wikipedia articles
+#' @return A table with the most recent instance of each wikipedia articles in the input
+#' @export
+#'
+#' @examples
+#'
+#' category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+#'
+
+get_category_most_recent=function(list_art){
+  dfn_art=c()
+  for(art in 1:length(list_art)){
+    dfn_load=c()
+    print(list_art[art])
+    dfn_load=try(get_article_most_recent_table(list_art[art]))
+
     if(length(dfn_load)>1){
       dfn_art=rbind(dfn_art,dfn_load)
     }

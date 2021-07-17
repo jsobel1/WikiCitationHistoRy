@@ -16,9 +16,9 @@ Then, install the WikipediaHistoRy package from Github:
 
 First you need to load few packages that are required:
 
-library("WikiCitationHistoRy")
-library("httr")
-library("openxlsx")
+		library("WikiCitationHistoRy")
+		library("httr")
+		library("openxlsx")
 
 To retrieve the text of a given page and the revision history:
 
@@ -50,7 +50,13 @@ To export the history of a page in an xlsx format:
 
 here the argument "Zeitgeber" is the name of the exported xlsx.
 
- 
+To get multiple articles history at once you can use:
+
+		Category_articles_history=get_category_articles_history(c("Zeitgeber","Advanced sleep phase disorder"))
+
+Note that it can take a long time if you have many articles or if the articles have many revisions.
+
+
 
 
 
