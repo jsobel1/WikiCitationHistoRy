@@ -1262,7 +1262,7 @@ get_citation_type=function(article_most_recent_table){
     return(cat_table_list)
   }
 
-  get_subcat_multiple(test$title)
+ # get_subcat_multiple(test$title)
 
   get_page_in_cat_multiple=function(catlist,replecement="_"){
     cat_table_list=c()
