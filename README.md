@@ -1,6 +1,7 @@
 # WikiCitationHistoRy
 
-![](https://github.com/jsobel1/WikiCitationHistoRy/blob/master/img/WikiHistory_logo_V3_test.png){ height=100px width=100px }
+<img src="https://github.com/jsobel1/WikiCitationHistoRy/blob/master/img/WikiHistory_logo_V3_test.png" width="250">
+
 
 WikiCitationHistoRy was developed in order to retrieve the history of any wikipedia article and its content as timestamps, revision ID , users, article size, and citations counts,and article text. This package allows retrieval of all information in structured tables and provides several visualisations for the data.
 
