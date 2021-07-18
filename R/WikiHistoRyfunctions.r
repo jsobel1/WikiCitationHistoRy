@@ -306,9 +306,11 @@ pkg.env$book_regexp='\\{\\{cite book .*?\\}\\}'
 
 pkg.env$pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
 
-pkg.env$ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
+pkg.env$ref_in_text_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
 
-pkg.env$cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
+pkg.env$ref_regexp='<ref.*?</ref>' # All refs of a page
+
+pkg.env$cite_regexp='\\{\\{[c|C]ite.*?\\}\\}' # All citations using the template
 
 pkg.env$wikihyperlink_regexp='\\[\\[.*?\\]\\]'
 
@@ -344,9 +346,11 @@ pkg.env$regexp_list=c(
 
   pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}",
 
-  ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>', # in-text refs!
+  ref_in_text_regexp='<ref>\\{\\{.*?\\}\\}</ref>', # in-text refs!
 
-  cite_regexp='\\{\\{[c|C]ite.*?\\}\\}',
+  ref_regexp='<ref.*?</ref>', # All refs of a page
+
+  cite_regexp='\\{\\{[c|C]ite.*?\\}\\}', # All citations using the template
 
   template_regexp='\\{\\{pp.*?\\}\\}'
 )
@@ -385,7 +389,9 @@ pkg.env$regexp_list=c(
 #'
 #' pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
 #'
-#' ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
+#' ref_in_text_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
+#'
+#' ref_regexp='<ref.*?</ref>'
 #'
 #' cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
 #'
