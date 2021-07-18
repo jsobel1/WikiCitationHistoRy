@@ -20,9 +20,9 @@ Then, install the **WikipediaHistoRy** package from Github:
 
 First you need to load few packages that are required:
 
-		library("WikiCitationHistoRy")
-		library("httr")
-		library("openxlsx")
+	library("WikiCitationHistoRy")
+	library("httr")
+	library("openxlsx")
 
 ## Content of **WikiCitationHistoRy** package
 1. Retrieve most recent content or full history of one or more Wikipedia pages and pages informations.
@@ -37,37 +37,37 @@ network of co-citations, and more
 
 To retrieve the text of a given page and the revision history:
 
-		Zeitgeber_history=get_article_full_history_table("Zeitgeber")
+	Zeitgeber_history=get_article_full_history_table("Zeitgeber")
 
 Here all the revisions of the Zeitgeber page are retrived and stored in a table with the following structure
 
-		colnames(Zeitgeber_history)
+	colnames(Zeitgeber_history)
 
-		"art"       "revid"     "parentid"  "user"      "userid"    "timestamp" "size"     "comment"   "*"      
+	"art"       "revid"     "parentid"  "user"      "userid"    "timestamp" "size"     "comment"   "*"      
 
 art is the name of the page; revid is the revision ID number; parentid is the revision id of the previous version used for the current revision;  user is the name of the user responsible for the update; the userid is the id of the user; timestamp is the logged timestamp of the current revision; the size is the length in bits of the article; comments are annotations made by user on the given revision; * is the raw text of the page of the given revision.
 
 To get the initial (first) version of an article in the same format, you can use:
 
-		get_article_initial_table("Zeitgeber")
+	get_article_initial_table("Zeitgeber")
 
 or for the most recent version:
 
-		get_article_most_recent_table("Zeitgeber")
+	get_article_most_recent_table("Zeitgeber")
 
 To get only informations on the current version of the article:
 
-		get_article_info_table("Zeitgeber")
+	get_article_info_table("Zeitgeber")
 
 To export the history of a page in an xlsx format:
 
-		write_wiki_history_to_xlsx(Zeitgeber_history,"Zeitgeber")
+	write_wiki_history_to_xlsx(Zeitgeber_history,"Zeitgeber")
 
 here the argument "Zeitgeber" is the name of the exported xlsx.
 
 To get multiple articles history at once you can use:
 
-		Category_articles_history=get_category_articles_history(c("Zeitgeber","Advanced sleep phase disorder"))
+	Category_articles_history=get_category_articles_history(c("Zeitgeber","Advanced sleep phase disorder"))
 
 *Note that it can take a long time if there are many articles or if the articles have many revisions.*
 
@@ -80,9 +80,55 @@ To get a list of pages related to a single wikipedia category you can use the fo
 	library(WikipediR)
 	get_pagename_in_cat("Circadian rhythm")
 
-## Count, extract and parse citations, urls, hyperlinks and more
+*Note that wikipedia pages with special characters in the title are not properly working for unknown reason. 
+please contact me (jsobel83@gmail.com) if you find the solution to this problem.*
 
-Next several functions will be useful to count references, hyperlink, url and more
+## Extraction and parsing of citations, urls, hyperlinks and more
+
+Working with citations in wikipedia can be a bit tricky. However, there is a citation template called [**Citation Style 1**](https://en.wikipedia.org/wiki/Help:Citation_Style_1), that is quite used. Unfortunately, it is possible to cite a reference without the use of the template. Thus, in this package, we developped a parser working on the **Citation Style 1** and multiple *regular expressions* allowing the extraction of DOI, ISBN, PMID, URL, hyperlinks or page protection information (locked page).  
+
+For this purpose we developped a generic function which takes in arguments 
+the table of revisions of one or more wikipedia page and a regular expression:
+
+	get_regex_citations_in_wiki_table(article_wiki_table,citation_regexp) # generic syntaxe
+
+Here is the list of regular expressions in the package
+
+**Citation Style 1**:
+
+	tweet_regexp='\\{\\{cite tweet.*?\\}\\}'
+	news_regexp='\\{\\{cite news.*?\\}\\}'
+	journal_regexp='\\{\\{cite journal.*?\\}\\}'
+	web_regexp='\\{\\{cite web.*?\\}\\}'
+	article_regexp='\\{\\{cite article.*?\\}\\}'
+	report_regexp='\\{\\{cite report.*?\\}\\}'
+	court_regexp='\\{\\{cite court.*?\\}\\}'
+	press_release_regexp='\\{\\{cite press release.*?\\}\\}'
+	book_regexp='\\{\\{cite book .*?\\}\\}'
+	cite_regexp='\\{\\{[c|C]ite.*?\\}\\}' # All citations using the template
+
+Others *regexp*:
+
+	doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+" 
+	isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]' 
+	url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+	pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
+	ref_in_text_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs
+	ref_regexp='<ref.*?</ref>' # All refs of a page
+	wikihyperlink_regexp='\\[\\[.*?\\]\\]' # hyperlink between wikipedia pages
+	template_regexp='\\{\\{pp.*?\\}\\}' # protection informations
+
+You can use this function with your own regular expression to extract anything on a wikipedia table (multiple pages, and/or revisions)
+
+a working example will be as follow:
+	
+	category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+
+ 	extracted_citation_table=get_regex_citations_in_wiki_table(category_most_recent, "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+") # doi_regexp
+
+Here *extracted_citation_table* is a dataframe with 3 columns includin the name of the page, the revision ID and the extracted infromation thanks to the regular expression. In this example we extracted every DOI from the most recent pages "Zeitgeber","Advanced sleep phase disorder", and "Sleep deprivation". 
+
+Next several functions will be useful to count references, hyperlink, url and others.
 
 
 

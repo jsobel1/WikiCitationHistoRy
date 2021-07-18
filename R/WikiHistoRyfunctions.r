@@ -563,29 +563,6 @@ parse_article_ALL_citations=function(art_text){
   return(df_out)
 }
 
-#' Get SciScore from wikipedia article content
-#'
-#' This function get a wikipedia article content
-#' and return SciScore from citation template journal citation over all citations
-#'
-#' @param art_text text content of wikipedia article
-#' @return SciScore
-#' @export
-#'
-#' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' Get_sci_score(art_test[9])
-#'
-
-
-Get_sci_score=function(art_text){
-  extracted_cite=tryCatch(extract_citations(art_text),error = function(e) 0)
-  cite_type=sapply(extracted_cite,parse_cite_type)
-  all_cite_sum= tryCatch(sum(table(cite_type)),error = function(e) 0)
-  journal_cite= tryCatch(table(cite_type)[which(names(table(cite_type))=="journal")],error = function(e) NA)
-  if(length(journal_cite)==0){return(0)}
-  return(as.numeric(as.character(journal_cite/all_cite_sum)))
-}
 
 #' Get refCount from wikipedia article content
 #'
@@ -694,6 +671,31 @@ get_ISBN_count=function(art_text){
   ISBN_count=length(as.character(unlist(ISBN_fetched)))
   return(as.numeric(as.character(ISBN_count)))
 }
+
+#' Get SciScore from wikipedia article content
+#'
+#' This function get a wikipedia article content
+#' and return SciScore from citation template journal citation over all citations
+#'
+#' @param art_text text content of wikipedia article
+#' @return SciScore
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' Get_sci_score(art_test[9])
+#'
+
+
+Get_sci_score=function(art_text){
+  extracted_cite=tryCatch(extract_citations(art_text),error = function(e) 0)
+  cite_type=sapply(extracted_cite,parse_cite_type)
+  all_cite_sum= tryCatch(sum(table(cite_type)),error = function(e) 0)
+  journal_cite= tryCatch(table(cite_type)[which(names(table(cite_type))=="journal")],error = function(e) NA)
+  if(length(journal_cite)==0){return(0)}
+  return(as.numeric(as.character(journal_cite/all_cite_sum)))
+}
+
 
 
 #' Get SciScore2 from wikipedia article content
