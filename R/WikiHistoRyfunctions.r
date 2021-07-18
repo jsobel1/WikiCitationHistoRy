@@ -1,3 +1,7 @@
+
+# Retrieve article content, history/revisions, information of page, most recent version
+
+
 #' Get Article History table
 #'
 #' This function get an english wikipedia article title as input
@@ -148,31 +152,6 @@ get_article_most_recent_table=function(article_name,date_an="2020-05-01T00:00:00
 }
 
 
-#' Write Article Table to an xlsx
-#'
-#' This function get a wikipedia article table as input and the name of the target xls file.
-#' an xlsx with the table is written in the working directory.
-#'
-#' @param wiki_hist wiki history table
-#' @param file_name output file name prefix
-#' @return nothing
-#' @export
-#'
-#' @examples
-#'
-#' tmpwikitable=get_article_initial_table("Zeitgeber")
-#' write_wiki_history_to_xlsx(tmpwikitable,"Zeitgeber")
-
-
-write_wiki_history_to_xlsx=function(wiki_hist,file_name){
-  wiki_hist[is.na(wiki_hist)]="-"
-  wiki_hist[is.null(wiki_hist)]="-"
-  df <- data.frame(art=wiki_hist$art,revid=wiki_hist$revid,parentid=wiki_hist$parentid,user=wiki_hist$user,userid=wiki_hist$userid,
-                   timestamp=wiki_hist$timestamp,size=wiki_hist$size,comment=wiki_hist$comment,content=wiki_hist$`*`,stringsAsFactors=FALSE)
-
-  write.xlsx(df,paste(file_name,"wiki_table.xlsx",sep="_"), sheetName="Sheet1",  col.names=TRUE, row.names=F, append=FALSE, showNA=T)
-}
-
 
 
 #' Get Category Articles history
@@ -250,7 +229,7 @@ get_category_articles_creation=function(list_art){
 #' category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
 #'
 
-get_category_most_recent=function(list_art){
+get_category_articles_most_recent=function(list_art){
   dfn_art=c()
   for(art in 1:length(list_art)){
     dfn_load=c()
@@ -290,52 +269,53 @@ get_pagename_in_cat=function(category){try({
     if(length(grep("User",cats2$query$categorymembers[[i]]$title))>0){  next}
     else if(length(grep("Category",cats2$query$categorymembers[[i]]$title))>0){next}
     else{
-      #print(cats2$query$categorymembers[[i]]$title)
       art_of_int=c(art_of_int,cats2$query$categorymembers[[i]]$title)
     }
   }
-
   return(unlist(art_of_int))
 })
 }
 
+# extractions and counts of various objects
 
-doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+" #Good enough
+pkg.env <- new.env()
 
-isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]' # good enough
+pkg.env$doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+" #Good enough
 
-url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+pkg.env$isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]' # good enough
 
-tweet_regexp='\\{\\{cite tweet.*?\\}\\}'
+pkg.env$url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
-news_regexp='\\{\\{cite news.*?\\}\\}'
+pkg.env$tweet_regexp='\\{\\{cite tweet.*?\\}\\}'
 
-journal_regexp='\\{\\{cite journal.*?\\}\\}'
+pkg.env$news_regexp='\\{\\{cite news.*?\\}\\}'
 
-web_regexp='\\{\\{cite web.*?\\}\\}'
+pkg.env$journal_regexp='\\{\\{cite journal.*?\\}\\}'
 
-article_regexp='\\{\\{cite article.*?\\}\\}'
+pkg.env$web_regexp='\\{\\{cite web.*?\\}\\}'
 
-report_regexp='\\{\\{cite report.*?\\}\\}'
+pkg.env$article_regexp='\\{\\{cite article.*?\\}\\}'
 
-court_regexp='\\{\\{cite court.*?\\}\\}'
+pkg.env$report_regexp='\\{\\{cite report.*?\\}\\}'
 
-press_release_regexp='\\{\\{cite press release.*?\\}\\}'
+pkg.env$court_regexp='\\{\\{cite court.*?\\}\\}'
 
-book_regexp='\\{\\{cite book .*?\\}\\}'
+pkg.env$press_release_regexp='\\{\\{cite press release.*?\\}\\}'
 
-pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
+pkg.env$book_regexp='\\{\\{cite book .*?\\}\\}'
 
-ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
+pkg.env$pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
 
-cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
+pkg.env$ref_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
 
-wikihyperlink_regexp='\\[\\[.*?\\]\\]'
+pkg.env$cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
 
-template_regexp='\\{\\{pp.*?\\}\\}'
+pkg.env$wikihyperlink_regexp='\\[\\[.*?\\]\\]'
+
+pkg.env$template_regexp='\\{\\{pp.*?\\}\\}'
 
 
-regexp_list=c(
+pkg.env$regexp_list=c(
   doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+", #Good enough
 
   isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]', # good enough
@@ -432,80 +412,6 @@ return(df_citation_revid_art)
 }
 
 
-#' Annotate DOI List with Eurompmc
-#'
-#' This function get a list of DOIs as input
-#' and create dataframe of annotated DOIs with Eurompmc
-#'
-#' @param doi_list names of wikipedia category
-#' @return dataframe of annotated DOIs with Eurompmc
-#' @export
-#'
-#' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
-#' annotate_doi_list_europmc(dois_fetched)
-
-annotate_doi_list_europmc=function(doi_list){
-  annotated_doi_df=c()
-  for(i in 1:length(doi_list)){ #
-    print(i)
-    print(doi_list[i])
-    annotated_dois_df_load=tryCatch(epmc_search(paste("DOI:",doi_list[i],sep="")),error = function(e) NULL)
-    if(is.null(annotated_dois_df_load)){annotated_dois_df_load=tryCatch(epmc_search(doi_list[i]),error = function(e) NULL)}
-    if(is.null(annotated_dois_df_load)){next}
-    if(dim(annotated_dois_df_load)[1]==1){
-      annotated_dois_df_load=dplyr::mutate(annotated_dois_df_load, id = if (exists('id', where = annotated_dois_df_load)) id else NA,
-                                           source = if (exists('source', where = annotated_dois_df_load)) source else NA,
-                                           pmid = if (exists('pmid', where = annotated_dois_df_load)) pmid else NA,
-                                           pmcid = if (exists('pmcid', where = annotated_dois_df_load)) pmcid else NA,
-                                           doi = if (exists('doi', where = annotated_dois_df_load)) doi else NA,
-                                           title = if (exists('title', where = annotated_dois_df_load)) title else NA,
-                                           authorString = if (exists('authorString', where = annotated_dois_df_load)) authorString else NA,
-                                           journalTitle = if (exists('journalTitle', where = annotated_dois_df_load)) journalTitle else NA,
-                                           pubYear = if (exists('pubYear', where = annotated_dois_df_load)) pubYear else NA,
-                                           pubType = if (exists('pubType', where = annotated_dois_df_load)) pubType else NA,
-                                           isOpenAccess = if (exists('isOpenAccess', where = annotated_dois_df_load)) isOpenAccess else NA,
-                                           citedByCount = if (exists('citedByCount', where = annotated_dois_df_load)) citedByCount else NA,
-                                           firstPublicationDate = if (exists('firstPublicationDate', where = annotated_dois_df_load)) firstPublicationDate else NA)
-      annotated_dois_df_load=tryCatch(dplyr::select(annotated_dois_df_load,id,source,pmid,pmcid,doi,title,
-                                                    authorString,journalTitle,pubYear,pubType,isOpenAccess,citedByCount,
-                                                    firstPublicationDate),error = function(e) NULL)
-      if(is.null(annotated_dois_df_load)){next}
-      annotated_doi_df=rbind(annotated_doi_df,annotated_dois_df_load)
-    }
-  }
-  return(data.frame(annotated_doi_df))
-
-}
-
-
-#' Annotate DOI List with CrossRef
-#'
-#' This function get a list of DOIs as input
-#' and create dataframe of annotated DOIs with CrossRef
-#'
-#' @param doi_list names of wikipedia category
-#' @return dataframe of annotated DOIs with CrossRef
-#' @export
-#'
-#' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
-#' annotate_doi_list_cross_ref(dois_fetched)
-#'
-
-annotate_doi_list_cross_ref=function(doi_list){
-  doi_bib=cr_cn(dois = doi_list,"bibentry",.progress = "text")
-
-  doi_bib_df=dcast(melt(doi_bib[-(which(lapply(doi_bib,length)==0))]), L1 ~ L2)
-
-  citation_countdf=cr_citation_count(doi = doi_bib_df$doi)
-
-  doi_bib_df=doi_bib_df%>%dplyr::left_join(citation_countdf,by=c("doi"))
-
-  return(doi_bib_df)
-}
 
 
 #' Parse Citation Type
@@ -975,21 +881,7 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 }
 
 
-export_extracted_citations_xlsx=function(article_most_recent_table,name_file_prefix){
 
-  for(i in 1:length(regexp_list)){
-    tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(regexp_list[i]))
-    #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
-
-    #if(i ==1){
-    try(write.xlsx(tmp_table, file=paste(name_file_prefix,as.character(names(regexp_list)[i]),"exctracted_citations.xlsx",sep="_"),
-                   sheetName=as.character(names(regexp_list)[i]), append=FALSE))
-    #}else{
-    # try(write.xlsx(tmp_table, file="Exctracted_citations.xlsx",
-    #            sheetName=as.character(names(regexp_list)[i]), append=TRUE))
-    #}
-  }
-}
 
 extract_citations_regexp=function(article_most_recent_table){
   extracted_citation_list=list()
@@ -1002,6 +894,83 @@ extract_citations_regexp=function(article_most_recent_table){
   names(extracted_citation_list)=names(regexp_list)
   return(extracted_citation_list)
 }
+
+
+#' Annotate DOI List with Eurompmc
+#'
+#' This function get a list of DOIs as input
+#' and create dataframe of annotated DOIs with Eurompmc
+#'
+#' @param doi_list names of wikipedia category
+#' @return dataframe of annotated DOIs with Eurompmc
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
+#' annotate_doi_list_europmc(dois_fetched)
+
+annotate_doi_list_europmc=function(doi_list){
+  annotated_doi_df=c()
+  for(i in 1:length(doi_list)){ #
+    print(i)
+    print(doi_list[i])
+    annotated_dois_df_load=tryCatch(epmc_search(paste("DOI:",doi_list[i],sep="")),error = function(e) NULL)
+    if(is.null(annotated_dois_df_load)){annotated_dois_df_load=tryCatch(epmc_search(doi_list[i]),error = function(e) NULL)}
+    if(is.null(annotated_dois_df_load)){next}
+    if(dim(annotated_dois_df_load)[1]==1){
+      annotated_dois_df_load=dplyr::mutate(annotated_dois_df_load, id = if (exists('id', where = annotated_dois_df_load)) id else NA,
+                                           source = if (exists('source', where = annotated_dois_df_load)) source else NA,
+                                           pmid = if (exists('pmid', where = annotated_dois_df_load)) pmid else NA,
+                                           pmcid = if (exists('pmcid', where = annotated_dois_df_load)) pmcid else NA,
+                                           doi = if (exists('doi', where = annotated_dois_df_load)) doi else NA,
+                                           title = if (exists('title', where = annotated_dois_df_load)) title else NA,
+                                           authorString = if (exists('authorString', where = annotated_dois_df_load)) authorString else NA,
+                                           journalTitle = if (exists('journalTitle', where = annotated_dois_df_load)) journalTitle else NA,
+                                           pubYear = if (exists('pubYear', where = annotated_dois_df_load)) pubYear else NA,
+                                           pubType = if (exists('pubType', where = annotated_dois_df_load)) pubType else NA,
+                                           isOpenAccess = if (exists('isOpenAccess', where = annotated_dois_df_load)) isOpenAccess else NA,
+                                           citedByCount = if (exists('citedByCount', where = annotated_dois_df_load)) citedByCount else NA,
+                                           firstPublicationDate = if (exists('firstPublicationDate', where = annotated_dois_df_load)) firstPublicationDate else NA)
+      annotated_dois_df_load=tryCatch(dplyr::select(annotated_dois_df_load,id,source,pmid,pmcid,doi,title,
+                                                    authorString,journalTitle,pubYear,pubType,isOpenAccess,citedByCount,
+                                                    firstPublicationDate),error = function(e) NULL)
+      if(is.null(annotated_dois_df_load)){next}
+      annotated_doi_df=rbind(annotated_doi_df,annotated_dois_df_load)
+    }
+  }
+  return(data.frame(annotated_doi_df))
+
+}
+
+
+#' Annotate DOI List with CrossRef
+#'
+#' This function get a list of DOIs as input
+#' and create dataframe of annotated DOIs with CrossRef
+#'
+#' @param doi_list names of wikipedia category
+#' @return dataframe of annotated DOIs with CrossRef
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
+#' annotate_doi_list_cross_ref(dois_fetched)
+#'
+
+annotate_doi_list_cross_ref=function(doi_list){
+  doi_bib=cr_cn(dois = doi_list,"bibentry",.progress = "text")
+
+  doi_bib_df=dcast(melt(doi_bib[-(which(lapply(doi_bib,length)==0))]), L1 ~ L2)
+
+  citation_countdf=cr_citation_count(doi = doi_bib_df$doi)
+
+  doi_bib_df=doi_bib_df%>%dplyr::left_join(citation_countdf,by=c("doi"))
+
+  return(doi_bib_df)
+}
+
 
 annotate_isbn_google=function(isbn_nb){
   isbn_nb=gsub("-","",isbn_nb)
@@ -1037,12 +1006,6 @@ annotate_doi_to_bibtex_cross_ref=function(doi_list){
   doi_bib=cr_cn(dois = doi_list,"bibtex",.progress = "text")
   return(doi_bib)
 }
-
-export_doi_to_bib=function(doi_list,file_name="doi_file_top_high_100520.bib"){
-  dfa=annotate_doi_to_bibtex_cross_ref(doi_list)
-  lapply(dfa, function(x) write.table( x, file_name  , append= T, sep='\n\n' ,quote = F,col.names = F,row.names = F))
-}
-
 
 annotate_isbn_openlib=function(isbn_nb){
   isbn_nb=gsub("-","",isbn_nb)
@@ -1311,4 +1274,57 @@ get_citation_type=function(article_most_recent_table){
     }
     return(unique(table_out))
   }
+
+
+
+  # Exports of history and category tables
+
+  #' Write Article Table to an xlsx
+  #'
+  #' This function get a wikipedia article table as input and the name of the target xls file.
+  #' an xlsx with the table is written in the working directory.
+  #'
+  #' @param wiki_hist wiki history table
+  #' @param file_name output file name prefix
+  #' @return nothing
+  #' @export
+  #'
+  #' @examples
+  #'
+  #' tmpwikitable=get_article_initial_table("Zeitgeber")
+  #' write_wiki_history_to_xlsx(tmpwikitable,"Zeitgeber")
+
+
+  write_wiki_history_to_xlsx=function(wiki_hist,file_name){
+    wiki_hist[is.na(wiki_hist)]="-"
+    wiki_hist[is.null(wiki_hist)]="-"
+    df <- data.frame(art=wiki_hist$art,revid=wiki_hist$revid,parentid=wiki_hist$parentid,user=wiki_hist$user,userid=wiki_hist$userid,
+                     timestamp=wiki_hist$timestamp,size=wiki_hist$size,comment=wiki_hist$comment,content=wiki_hist$`*`,stringsAsFactors=FALSE)
+
+    write.xlsx(df,paste(file_name,"wiki_table.xlsx",sep="_"), sheetName="Sheet1",  col.names=TRUE, row.names=F, append=FALSE, showNA=T)
+  }
+
+
+
+  export_doi_to_bib=function(doi_list,file_name="doi_file_top_high_100520.bib"){
+    dfa=annotate_doi_to_bibtex_cross_ref(doi_list)
+    lapply(dfa, function(x) write.table( x, file_name  , append= T, sep='\n\n' ,quote = F,col.names = F,row.names = F))
+  }
+
+  export_extracted_citations_xlsx=function(article_most_recent_table,name_file_prefix){
+
+    for(i in 1:length(regexp_list)){
+      tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(regexp_list[i]))
+      #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
+
+      #if(i ==1){
+      try(write.xlsx(tmp_table, file=paste(name_file_prefix,as.character(names(regexp_list)[i]),"exctracted_citations.xlsx",sep="_"),
+                     sheetName=as.character(names(regexp_list)[i]), append=FALSE))
+      #}else{
+      # try(write.xlsx(tmp_table, file="Exctracted_citations.xlsx",
+      #            sheetName=as.character(names(regexp_list)[i]), append=TRUE))
+      #}
+    }
+  }
+
 

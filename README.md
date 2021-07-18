@@ -14,11 +14,15 @@ Then, install the WikipediaHistoRy package from Github:
 
 # First steps and use cases with WikiCitationHistoRy
 
+
+
 First you need to load few packages that are required:
 
 		library("WikiCitationHistoRy")
 		library("httr")
 		library("openxlsx")
+
+## Get wikipedia pages content and information
 
 To retrieve the text of a given page and the revision history:
 
@@ -54,7 +58,13 @@ To get multiple articles history at once you can use:
 
 		Category_articles_history=get_category_articles_history(c("Zeitgeber","Advanced sleep phase disorder"))
 
-Note that it can take a long time if you have many articles or if the articles have many revisions.
+Note that it can take a long time if there are many articles or if the articles have many revisions.
+
+## Count, extract and parse citations
+
+Next several functions will be useful to count references, hyperlink, url and more
+
+
 
 
 
