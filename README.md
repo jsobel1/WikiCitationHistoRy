@@ -7,20 +7,28 @@ first, install the devtools package:
 
  	install.packages("devtools")
 
-Then, install the WikipediaHistoRy package from Github:
+Then, install the **WikipediaHistoRy** package from Github:
 
 	library(devtools)
 	install_github("jsobel1/WikiCitationHistoRy")
 
-# First steps and use cases with WikiCitationHistoRy
-
-
+# First steps and use cases with **WikiCitationHistoRy**
 
 First you need to load few packages that are required:
 
 		library("WikiCitationHistoRy")
 		library("httr")
 		library("openxlsx")
+
+## Content of **WikiCitationHistoRy** package
+1. Retrieve most recent content or full history of one or more Wikipedia pages and pages informations.
+2. Extract citations, references, hyperlinks, DOIs, ISBN, PMID, and others.
+3. Annotate DOIs with Altmetrics, Europmc, CrossRef; Annotate ISBN with google book, altmetrics, openlib
+4. Export in xlsx tables.
+5. Compute SciScore for each revision and latency for each DOI citation.
+6. Make various visualisations such as timeline of wikipedia article creation in a category, timeline of edits and views per page,
+network of co-citations, and more  
+
 
 ## Get wikipedia pages content and information
 
@@ -64,7 +72,7 @@ To get multiple articles most recent content in the same format at once you can 
 
 	Category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
 
-To get a list of pages related to a single wikipedia category you can use the following function based on *WikipediR*:
+To get a list of pages related to a single wikipedia category you can use the following function based on *WikipediR* R package:
 
 	library(WikipediR)
 	get_pagename_in_cat("Circadian rhythm")
