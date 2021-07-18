@@ -1,9 +1,9 @@
 # WikiCitationHistoRy R package
 
+WikiCitationHistoRy was developed in order to retrieve the history and its content of any wikipedia article as timestamps, revision ID , users, article size,and article text. This package allows retrieval of all information in structured tables and provides several visualisations of the data. In addition, the package offers several options to extract citations and references, and annotate them.
+
 <img src="https://github.com/jsobel1/WikiCitationHistoRy/blob/master/img/WikiHistory_logo_V3_test.png" width="250">
 
-
-WikiCitationHistoRy was developed in order to retrieve the history and its content of any wikipedia article as timestamps, revision ID , users, article size,and article text. This package allows retrieval of all information in structured tables and provides several visualisations of the data. In addition, the package offers several options to extract citations and references, and annotate them.
 
 # Package installation
 
@@ -28,11 +28,10 @@ First you need to load few packages that are required:
 1. Retrieve most recent content or full history of one or more Wikipedia pages and pages informations.
 2. Extract citations, references, hyperlinks, DOIs, ISBN, PMID, and others.
 3. Annotate DOIs with Altmetrics, Europmc, CrossRef; Annotate ISBN with google book, altmetrics, openlib
-4. Export in xlsx tables.
-5. Compute SciScore for each revision and latency for each DOI citation.
+4. Exports in xlsx tables.
+5. Compute SciScore for a page and latency for each DOI annotated citation.
 6. Make various visualisations such as timeline of wikipedia article creation in a category, timeline of edits and views per page,
 network of co-citations, and more  
-
 
 ## Get wikipedia pages content and information
 
