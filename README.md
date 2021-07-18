@@ -1,4 +1,7 @@
 # WikiCitationHistoRy
+
+![](imag/WikiHistory_logo_V3_test.png)
+
 WikiCitationHistoRy was developed in order to retrieve the history of any wikipedia article and its content as timestamps, revision ID , users, article size, and citations counts,and article text. This package allows retrieval of all information in structured tables and provides several visualisations for the data.
 
 # Package installation
@@ -66,7 +69,7 @@ To get multiple articles history at once you can use:
 
 		Category_articles_history=get_category_articles_history(c("Zeitgeber","Advanced sleep phase disorder"))
 
-Note that it can take a long time if there are many articles or if the articles have many revisions.
+*Note that it can take a long time if there are many articles or if the articles have many revisions.*
 
 To get multiple articles most recent content in the same format at once you can use:
 
