@@ -218,7 +218,7 @@ get_category_articles_creation=function(list_art){
 #' Get Category Articles most recent
 #'
 #' This function get a list of wikipedia article titles as input
-#' and create a wipipedia articles most recent table
+#' and create a wipipedia table with most recent version of the pages
 #'
 #' @param list_art list of wikipedia articles
 #' @return A table with the most recent instance of each wikipedia articles in the input
