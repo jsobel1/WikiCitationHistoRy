@@ -60,7 +60,16 @@ To get multiple articles history at once you can use:
 
 Note that it can take a long time if there are many articles or if the articles have many revisions.
 
-## Count, extract and parse citations
+To get multiple articles most recent content in the same format at once you can use:
+
+	Category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+
+To get a list of pages related to a single wikipedia category you can use the following function based on *WikipediR*:
+
+	library(WikipediR)
+	get_pagename_in_cat("Circadian rhythm")
+
+## Count, extract and parse citations, urls, hyperlinks and more
 
 Next several functions will be useful to count references, hyperlink, url and more
 
