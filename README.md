@@ -125,7 +125,7 @@ a working example will be as follow:
 
 Here *extracted_citation_table* is a dataframe with 3 columns including the name of the page, the revision ID and the extracted infromation thanks to the regular expression. In this example, we extracted every DOI from the most recent pages "Zeitgeber","Advanced sleep phase disorder", and "Sleep deprivation". 
 
-To extract and export in multiple xlsx every predefined regular expression matches :
+To extract and export in multiple xlsx every predefined regular expression matches:
 
 	export_extracted_citations_xlsx(category_most_recent,"Category_most_recent")
 
@@ -140,6 +140,45 @@ This function gets a wikipedia page table as input and return the the parsed cit
 the output is  6 column dataframe containing page name, revisionID, type of citation,
 an integer value for each citation extracted in a given page, citation variable names (i.e publisher, date, authors)
 and values.
+
+## DOI annotations
+
+*Note that quality of retrieved informations and number of successfully annotated elements may varies depending on the source. Thus we implemented several solutaions and we will add more sources in the future*
+
+As shown above we can extract DOI with the following code:
+
+	category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+	extracted_citation_table=get_regex_citations_in_wiki_table(category_most_recent, "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+") # doi_regexp
+
+next to annotate DOI with EuropePMC R package you can simply use:
+
+	library(europepmc)
+	DOI_annotated_epmc=annotate_doi_list_europmc(as.character(extracted_citation_table$citation_fetched))
+
+*DOI_annotated_epmc* is a table of DOI with many informations such as authors, journal, publication date, Open-Access information, and citation count in the scientific literature.
+
+We can get similar informations from the R CrossRef package with the following code:
+
+	library(rcrossref)
+	DOI_annotated_rcrossref=annotate_doi_list_cross_ref(as.character(extracted_citation_table$citation_fetched))
+
+*Note that Rcrossref can be quite slow for large list.*
+
+We can get similar informations and impact of the publication from the R Altmetric package with the following code:
+
+	library(rAltmetric)
+	library(purrr)
+	DOI_annotated_altmetrics=annotate_doi_list_altmetrics(list(as.character(extracted_citation_table$citation_fetched)))
+
+*Note that dates from Altmetrics are in unix timestamp. for more information on each field look at the rAltmetric website*
+
+
+### To Do: 
+- ISBN annotations
+- SciScore & latency examples
+- Exports 
+- Visualisation examples
+
 
 *Note that this package is still under development. Please contact me (jsobel83@gmail.com) if you want to contribute.*
 

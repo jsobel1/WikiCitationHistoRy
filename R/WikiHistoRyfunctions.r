@@ -127,7 +127,7 @@ get_article_info_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
 #'
 #'
 #' @param article_name Path to the input file
-#' @param date_an input date to select most recent version
+#' @param date_an input date to select most recent version with the following format : 2020-05-01T00:00:00Z
 #' @return A table with the last revision of the wikipedia article
 #' @export
 #'
@@ -150,8 +150,6 @@ get_article_most_recent_table=function(article_name,date_an="2020-05-01T00:00:00
 
   return(output_table)
 }
-
-
 
 
 #' Get Category Articles history
@@ -418,8 +416,6 @@ return(df_citation_revid_art)
 }
 
 
-
-
 #' Parse Citation Type
 #'
 #' This function get a citation as input
@@ -578,8 +574,6 @@ parse_article_ALL_citations=function(art_text){
 #' get_refCount(art_test[9])
 #'
 
-
-
 get_refCount=function(art_text){
   ref_regexp='<ref.*?</ref>'
   ref_fetched=str_match_all(art_text, ref_regexp)
@@ -727,10 +721,10 @@ Get_sci_score2=function(art_text){
   return(as.numeric(as.character(doi_count/ref_count)))
 }
 
-#' Get Sorce Type count
+#' Get Source Type count
 #'
 #' This function get a wikipedia article content as input
-#' and return the the count of a citation such as book, website,newspaper, journal
+#' and return the the count of a citation from the CS1 template such as book, website, newspaper, journal
 #'
 #' @param art_text wiki article content
 #' @return citation_type_count
@@ -795,19 +789,6 @@ get_paresd_citations=function(article_most_recent_table){
   #write.table(df_cite_parsed_revid_art,"df_cite_parsed_revid_art.csv",quote = F,row.names = F,sep=";")
 
   return(df_cite_parsed_revid_art)
-}
-
-
-extract_citations_regexp=function(article_most_recent_table){
-  extracted_citation_list=list()
-
-  for(i in 1:length(pkg.env$regexp_list)){
-    tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(pkg.env$regexp_list[i]))
-    #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
-    extracted_citation_list[[i]]=tmp_table
-  }
-  names(extracted_citation_list)=names(pkg.env$regexp_list)
-  return(extracted_citation_list)
 }
 
 
@@ -974,9 +955,6 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 }
 
 
-
-
-
 #' Annotate DOI List with Eurompmc
 #'
 #' This function get a list of DOIs as input
@@ -1052,6 +1030,10 @@ annotate_doi_list_cross_ref=function(doi_list){
   return(doi_bib_df)
 }
 
+annotate_doi_to_bibtex_cross_ref=function(doi_list){
+  doi_bib=cr_cn(dois = doi_list,"bibtex",.progress = "text")
+  return(doi_bib)
+}
 
 annotate_isbn_google=function(isbn_nb){
   isbn_nb=gsub("-","",isbn_nb)
@@ -1083,13 +1065,11 @@ annotate_isbn_list_altmetrics=function(isbn_list){
   return(results)
 }
 
-annotate_doi_to_bibtex_cross_ref=function(doi_list){
-  doi_bib=cr_cn(dois = doi_list,"bibtex",.progress = "text")
-  return(doi_bib)
-}
+
 
 annotate_isbn_openlib=function(isbn_nb){
   isbn_nb=gsub("-","",isbn_nb)
+  isbn_nb=gsub(" ","",isbn_nb)
   cmd=paste("https://openlibrary.org/api/books?bibkeys=ISBN",isbn_nb,"&format=json",sep="")
   resp=GET(cmd)
   parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
@@ -1279,6 +1259,7 @@ get_citation_type=function(article_most_recent_table){
   }
 
 
+###########
   get_subcat_table=function(catname,replecement="_"){#catname,depth_cat
     cat_table=c()
     catname=gsub("Category:","",catname)
@@ -1354,6 +1335,18 @@ get_citation_type=function(article_most_recent_table){
       depth=depth-1
     }
     return(unique(table_out))
+  }
+
+  extract_citations_regexp=function(article_most_recent_table){
+    extracted_citation_list=list()
+
+    for(i in 1:length(pkg.env$regexp_list)){
+      tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(pkg.env$regexp_list[i]))
+      #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
+      extracted_citation_list[[i]]=tmp_table
+    }
+    names(extracted_citation_list)=names(pkg.env$regexp_list)
+    return(extracted_citation_list)
   }
 
 

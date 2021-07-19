@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "jsobel83@gmail.com",
            comment = c(ORCID = "0000-0002-5111-4070"))
-Description: WikiCitationHistoRy is a library that allows to parse english wikipedia article history and extract references of any kind, such as doi, website, news,isbn and more.
+Description: WikiCitationHistoRy is a library that allows to parse english wikipedia article history and extract references of any kind, such as doi, website, news, isbn and more.
 License: CC BY-NC
 Encoding: UTF-8
 LazyData: true
