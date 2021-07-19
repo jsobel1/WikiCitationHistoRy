@@ -135,6 +135,11 @@ here the second argument of the function is a file prefix name. An xlsx file wit
 
 
 
+*Note that this package is still in developpment. Please contact me (jsobel83@gmail.com) if you want to contribute to further development.*
+
+
+
+
 
 
 
