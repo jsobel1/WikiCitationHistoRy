@@ -59,7 +59,7 @@ To get only informations on the current version of the article:
 
 	get_article_info_table("Zeitgeber")
 
-To export the history of a page in an xlsx format:
+To export the history (or a wikipedia table) of one or more pages in an xlsx format:
 
 	write_wiki_history_to_xlsx(Zeitgeber_history,"Zeitgeber")
 
