@@ -82,12 +82,12 @@ To get a list of pages related to a single wikipedia category you can use the fo
 
 ## Extraction and parsing of citations, urls, hyperlinks and more
 
-Working with citations in wikipedia can be a bit tricky. However, there is a citation template called [**Citation Style 1**](https://en.wikipedia.org/wiki/Help:Citation_Style_1), that is quite used. Unfortunately, it is possible to cite a reference without the use of the template. Thus, in this package, we developped a parser working on the **Citation Style 1** and multiple *regular expressions* allowing the extraction of DOI, ISBN, PMID, URL, hyperlinks or page protection information (locked page).  
+Working with citations in wikipedia can be a bit tricky. However, there is a citation template called [**Citation Style 1**](https://en.wikipedia.org/wiki/Help:Citation_Style_1), that is quite used. Unfortunately, it is possible to cite a reference without the use of the template. Thus, in this package, we developped a parser working on the **Citation Style 1** (CS1) and multiple *regular expressions* allowing the extraction of DOI, ISBN, PMID, URL, hyperlinks or page protection information (locked page).  
 
 For this purpose we developped a generic function which takes in arguments 
 the table of revisions of one or more wikipedia page and a regular expression:
 
-	get_regex_citations_in_wiki_table(article_wiki_table,citation_regexp) # generic syntaxe
+	get_regex_citations_in_wiki_table(article_wiki_table,citation_regexp) # generic syntaxe (not run)
 
 Here is the list of regular expressions in the package
 
@@ -127,13 +127,19 @@ Here *extracted_citation_table* is a dataframe with 3 columns including the name
 
 To extract and export in multiple xlsx every predefined regular expression matches :
 
-	export_extracted_citations_xlsx(Category_most_recent,"Category_most_recent")
+	export_extracted_citations_xlsx(category_most_recent,"Category_most_recent")
 
 Here the second argument of the function is a file prefix name. An xlsx file with matches for each regular expression will be created for each pages or revisions in the provided wikipeia table (here *Category_most_recent*).
 
 
+Next to parse citations information from the CS1 template:
 
+	paresd_citations=get_paresd_citations(category_most_recent)
 
+This function gets a wikipedia page table as input and return the the parsed citations from the CS1 template with every field.
+the output is  6 column dataframe containing page name, revisionID, type of citation,
+an integer value for each citation extracted in a given page, citation variable names (i.e publisher, date, authors)
+and values.
 
 *Note that this package is still under development. Please contact me (jsobel83@gmail.com) if you want to contribute.*
 
