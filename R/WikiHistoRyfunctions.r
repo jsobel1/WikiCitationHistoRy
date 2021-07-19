@@ -318,9 +318,9 @@ pkg.env$template_regexp='\\{\\{pp.*?\\}\\}'
 
 
 pkg.env$regexp_list=c(
-  doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+", #Good enough
+  doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+",
 
-  isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]', # good enough
+  isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]',
 
   url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
 
@@ -754,6 +754,25 @@ Get_source_type_counts=function(art_text){
 }
 
 
+#' Get parsed citations
+#'
+#' This function get a wikipedia page table as input
+#' and return the the parsed citations from the CS1 template with every field.
+#' the output is  6 column dataframe containing the page name, revisionID, type of citation,
+#' an integer value for each citation extracted, the citation variable name (i.e publisher, date, authors)
+#' and the variable value.
+#'
+#' @param article_most_recent_table wikipedia pages table
+#' @return df_cite_parsed_revid_art
+#' @export
+#'
+#' @examples
+#' category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+#' paresd_citations=get_paresd_citations(category_most_recent)
+#'
+#'
+
+
 get_paresd_citations=function(article_most_recent_table){
 
   df_cite_clean=c()
@@ -773,10 +792,77 @@ get_paresd_citations=function(article_most_recent_table){
 
   df_cite_parsed_revid_art=dplyr::select(article_most_recent_table,art,revid)%>%dplyr::right_join(df_cite_clean,by="revid")
 
-  write.table(df_cite_parsed_revid_art,"df_cite_parsed_revid_art.csv",quote = F,row.names = F,sep=";")
+  #write.table(df_cite_parsed_revid_art,"df_cite_parsed_revid_art.csv",quote = F,row.names = F,sep=";")
 
   return(df_cite_parsed_revid_art)
 }
+
+
+extract_citations_regexp=function(article_most_recent_table){
+  extracted_citation_list=list()
+
+  for(i in 1:length(pkg.env$regexp_list)){
+    tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(pkg.env$regexp_list[i]))
+    #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
+    extracted_citation_list[[i]]=tmp_table
+  }
+  names(extracted_citation_list)=names(pkg.env$regexp_list)
+  return(extracted_citation_list)
+}
+
+
+# Exports of history and category tables
+
+#' Write Article Table to an xlsx
+#'
+#' This function get a wikipedia article table as input and the name of the target xls file.
+#' an xlsx with the table is written in the working directory.
+#'
+#' @param wiki_hist wiki history table
+#' @param file_name output file name prefix
+#' @return nothing
+#' @export
+#'
+#' @examples
+#'
+#' tmpwikitable=get_article_initial_table("Zeitgeber")
+#' write_wiki_history_to_xlsx(tmpwikitable,"Zeitgeber")
+
+
+write_wiki_history_to_xlsx=function(wiki_hist,file_name){
+  wiki_hist[is.na(wiki_hist)]="-"
+  wiki_hist[is.null(wiki_hist)]="-"
+  df <- data.frame(art=wiki_hist$art,revid=wiki_hist$revid,parentid=wiki_hist$parentid,user=wiki_hist$user,userid=wiki_hist$userid,
+                   timestamp=wiki_hist$timestamp,size=wiki_hist$size,comment=wiki_hist$comment,content=wiki_hist$`*`,stringsAsFactors=FALSE)
+
+  write.xlsx(df,paste(file_name,"wiki_table.xlsx",sep="_"), sheetName="Sheet1",  col.names=TRUE, row.names=F, append=FALSE, showNA=T)
+}
+
+
+
+export_doi_to_bib=function(doi_list,file_name="doi_file_top_high_100520.bib"){
+  dfa=annotate_doi_to_bibtex_cross_ref(doi_list)
+  lapply(dfa, function(x) write.table( x, file_name  , append= T, sep='\n\n' ,quote = F,col.names = F,row.names = F))
+}
+
+export_extracted_citations_xlsx=function(article_most_recent_table,name_file_prefix){
+
+  for(i in 1:length(pkg.env$regexp_list)){
+    tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(pkg.env$regexp_list[i]))
+    #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
+
+    #if(i ==1){
+    try(write.xlsx(tmp_table, file=paste(name_file_prefix,as.character(names(pkg.env$regexp_list)[i]),"exctracted_citations.xlsx",sep="_"),
+                   sheetName=as.character(names(pkg.env$regexp_list)[i]), append=FALSE))
+    #}else{
+    # try(write.xlsx(tmp_table, file="Exctracted_citations.xlsx",
+    #            sheetName=as.character(names(regexp_list)[i]), append=TRUE))
+    #}
+  }
+}
+
+
+
 
 plot_article_creation_per_year=function(article_initial_table,name_title,Cumsum=T){
 
@@ -804,7 +890,6 @@ if(Cumsum==T){
   ggplot(dfcr_bin, aes(x = date,y=count)) +scale_x_date()+ geom_point()+ geom_line()+ggtitle(name_title)+theme_classic()
 }
   }
-
 
 plot_static_timeline=function(article_initial_table_sel){
 
@@ -890,18 +975,6 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 
 
 
-
-extract_citations_regexp=function(article_most_recent_table){
-  extracted_citation_list=list()
-
-  for(i in 1:length(regexp_list)){
-    tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(regexp_list[i]))
-    #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
-    extracted_citation_list[[i]]=tmp_table
-  }
-  names(extracted_citation_list)=names(regexp_list)
-  return(extracted_citation_list)
-}
 
 
 #' Annotate DOI List with Eurompmc
@@ -1285,54 +1358,5 @@ get_citation_type=function(article_most_recent_table){
 
 
 
-  # Exports of history and category tables
-
-  #' Write Article Table to an xlsx
-  #'
-  #' This function get a wikipedia article table as input and the name of the target xls file.
-  #' an xlsx with the table is written in the working directory.
-  #'
-  #' @param wiki_hist wiki history table
-  #' @param file_name output file name prefix
-  #' @return nothing
-  #' @export
-  #'
-  #' @examples
-  #'
-  #' tmpwikitable=get_article_initial_table("Zeitgeber")
-  #' write_wiki_history_to_xlsx(tmpwikitable,"Zeitgeber")
-
-
-  write_wiki_history_to_xlsx=function(wiki_hist,file_name){
-    wiki_hist[is.na(wiki_hist)]="-"
-    wiki_hist[is.null(wiki_hist)]="-"
-    df <- data.frame(art=wiki_hist$art,revid=wiki_hist$revid,parentid=wiki_hist$parentid,user=wiki_hist$user,userid=wiki_hist$userid,
-                     timestamp=wiki_hist$timestamp,size=wiki_hist$size,comment=wiki_hist$comment,content=wiki_hist$`*`,stringsAsFactors=FALSE)
-
-    write.xlsx(df,paste(file_name,"wiki_table.xlsx",sep="_"), sheetName="Sheet1",  col.names=TRUE, row.names=F, append=FALSE, showNA=T)
-  }
-
-
-
-  export_doi_to_bib=function(doi_list,file_name="doi_file_top_high_100520.bib"){
-    dfa=annotate_doi_to_bibtex_cross_ref(doi_list)
-    lapply(dfa, function(x) write.table( x, file_name  , append= T, sep='\n\n' ,quote = F,col.names = F,row.names = F))
-  }
-
-  export_extracted_citations_xlsx=function(article_most_recent_table,name_file_prefix){
-
-    for(i in 1:length(regexp_list)){
-      tmp_table=get_regex_citations_in_wiki_table(article_most_recent_table,as.character(regexp_list[i]))
-      #tmp_table=tmp_table%>%dplyr::filter(citation!="pmid",citation!="isbn")
-
-      #if(i ==1){
-      try(write.xlsx(tmp_table, file=paste(name_file_prefix,as.character(names(regexp_list)[i]),"exctracted_citations.xlsx",sep="_"),
-                     sheetName=as.character(names(regexp_list)[i]), append=FALSE))
-      #}else{
-      # try(write.xlsx(tmp_table, file="Exctracted_citations.xlsx",
-      #            sheetName=as.character(names(regexp_list)[i]), append=TRUE))
-      #}
-    }
-  }
 
 

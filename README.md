@@ -123,19 +123,19 @@ a working example will be as follow:
 
  	extracted_citation_table=get_regex_citations_in_wiki_table(category_most_recent, "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+") # doi_regexp
 
-Here *extracted_citation_table* is a dataframe with 3 columns including the name of the page, the revision ID and the extracted infromation thanks to the regular expression. In this example we extracted every DOI from the most recent pages "Zeitgeber","Advanced sleep phase disorder", and "Sleep deprivation". 
+Here *extracted_citation_table* is a dataframe with 3 columns including the name of the page, the revision ID and the extracted infromation thanks to the regular expression. In this example, we extracted every DOI from the most recent pages "Zeitgeber","Advanced sleep phase disorder", and "Sleep deprivation". 
 
 To extract and export in multiple xlsx every predefined regular expression matches :
 
 	export_extracted_citations_xlsx(Category_most_recent,"Category_most_recent")
 
-here the second argument of the function is a file prefix name. An xlsx file with matches for each regular expression will be created for each pages or revisions in the provided wikipeia table (here *Category_most_recent*).
+Here the second argument of the function is a file prefix name. An xlsx file with matches for each regular expression will be created for each pages or revisions in the provided wikipeia table (here *Category_most_recent*).
 
 
 
 
 
-*Note that this package is still in developpment. Please contact me (jsobel83@gmail.com) if you want to contribute to further development.*
+*Note that this package is still under development. Please contact me (jsobel83@gmail.com) if you want to contribute.*
 
 
 
