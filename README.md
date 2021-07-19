@@ -25,12 +25,12 @@ First you need to load few packages that are required:
 	library("openxlsx")
 
 ## Content of **WikiCitationHistoRy** package
-1. Retrieve most recent content or full history of one or more Wikipedia pages and pages informations.
-2. Extract citations, references, hyperlinks, DOIs, ISBN, PMID, and others.
-3. Annotate DOIs with Altmetrics, Europmc, CrossRef; Annotate ISBN with google book, altmetrics, openlib
-4. Exports in xlsx tables.
-5. Compute SciScore for a page and latency for each DOI annotated citation.
-6. Make various visualisations such as timeline of wikipedia article creation in a category, timeline of edits and views per page,
+- Retrieve most recent content or full history of one or more Wikipedia pages and pages informations.
+- Extract citations, references, hyperlinks, DOIs, ISBN, PMID, and others.
+- Annotate DOIs with Altmetrics, Europmc, CrossRef; Annotate ISBN with google book, altmetrics, openlib
+- Exports in xlsx tables.
+- Compute SciScore for a page and latency for each DOI annotated citation.
+- Make various visualisations such as timeline of wikipedia article creation in a category, timeline of edits and views per page,
 network of co-citations, and more  
 
 ## Get wikipedia pages content and information
@@ -80,9 +80,6 @@ To get a list of pages related to a single wikipedia category you can use the fo
 	library(WikipediR)
 	get_pagename_in_cat("Circadian rhythm")
 
-*Note that wikipedia pages with special characters in the title are not properly working for unknown reason. 
-please contact me (jsobel83@gmail.com) if you find the solution to this problem.*
-
 ## Extraction and parsing of citations, urls, hyperlinks and more
 
 Working with citations in wikipedia can be a bit tricky. However, there is a citation template called [**Citation Style 1**](https://en.wikipedia.org/wiki/Help:Citation_Style_1), that is quite used. Unfortunately, it is possible to cite a reference without the use of the template. Thus, in this package, we developped a parser working on the **Citation Style 1** and multiple *regular expressions* allowing the extraction of DOI, ISBN, PMID, URL, hyperlinks or page protection information (locked page).  
@@ -126,9 +123,16 @@ a working example will be as follow:
 
  	extracted_citation_table=get_regex_citations_in_wiki_table(category_most_recent, "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+") # doi_regexp
 
-Here *extracted_citation_table* is a dataframe with 3 columns includin the name of the page, the revision ID and the extracted infromation thanks to the regular expression. In this example we extracted every DOI from the most recent pages "Zeitgeber","Advanced sleep phase disorder", and "Sleep deprivation". 
+Here *extracted_citation_table* is a dataframe with 3 columns including the name of the page, the revision ID and the extracted infromation thanks to the regular expression. In this example we extracted every DOI from the most recent pages "Zeitgeber","Advanced sleep phase disorder", and "Sleep deprivation". 
 
-Next several functions will be useful to count references, hyperlink, url and others.
+To extract and export in multiple xlsx every predefined regular expression matches :
+
+	export_extracted_citations_xlsx(Category_most_recent,"Category_most_recent")
+
+here the second argument of the function is a file prefix name. An xlsx file with matches for each regular expression will be created for each pages or revisions in the provided wikipeia table (here *Category_most_recent*).
+
+
+
 
 
 
