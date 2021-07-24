@@ -17,7 +17,6 @@
 #' @examples
 #' Zeitgeber_history=get_article_full_history_table("Zeitgeber")
 
-
 get_article_full_history_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
   what="ids|timestamp|comment|user|userid|size|content" #|parsedcomment|tags|flags
 
@@ -84,8 +83,6 @@ get_article_initial_table=function(article_name){
   return(output_table)
 }
 
-
-
 #' Get Article Informations Table
 #'
 #' This function get an english wikipedia article title as input
@@ -118,7 +115,6 @@ get_article_info_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
   return(tmp_tab)
 }
 
-
 #' Get Article Most Recent Table
 #'
 #' This function get an english wikipedia article title as input
@@ -133,7 +129,6 @@ get_article_info_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
 #'
 #' @examples
 #' get_article_most_recent_table("Zeitgeber")
-
 
 get_article_most_recent_table=function(article_name,date_an="2020-05-01T00:00:00Z"){
   what="ids|timestamp|comment|user|userid|size|content" #|parsedcomment|tags|flags
@@ -150,7 +145,6 @@ get_article_most_recent_table=function(article_name,date_an="2020-05-01T00:00:00
 
   return(output_table)
 }
-
 
 #' Get Category Articles history
 #'
@@ -182,7 +176,6 @@ get_category_articles_history=function(list_art){
   return(dfn_art)
 }
 
-
 #' Get Category Articles creation
 #'
 #' This function get a list of wikipedia article titles as input
@@ -211,7 +204,6 @@ get_category_articles_creation=function(list_art){
   }
   return(dfn_art)
 }
-
 
 #' Get Category Articles most recent
 #'
@@ -280,7 +272,7 @@ pkg.env <- new.env()
 
 pkg.env$doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+" #Good enough
 
-pkg.env$isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]' # good enough
+pkg.env$isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)[-0-9X ]{13,20}'#'(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]' # to test
 
 pkg.env$url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
@@ -314,11 +306,10 @@ pkg.env$wikihyperlink_regexp='\\[\\[.*?\\]\\]'
 
 pkg.env$template_regexp='\\{\\{pp.*?\\}\\}'
 
-
 pkg.env$regexp_list=c(
   doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+",
 
-  isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]',
+  isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)[-0-9X ]{13,17}',#'(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]',
 
   url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
 
@@ -353,7 +344,6 @@ pkg.env$regexp_list=c(
   template_regexp='\\{\\{pp.*?\\}\\}'
 )
 
-
 #' Get Regex citations in wiki table
 #'
 #' This function get a regex of citations type and a wikipedia article table as input
@@ -363,7 +353,7 @@ pkg.env$regexp_list=c(
 #'
 #' doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+"
 #'
-#' isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]'
+#' isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)[-0-9X ]{13,17}'# '(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]'
 #'
 #' url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 #'
@@ -404,7 +394,7 @@ pkg.env$regexp_list=c(
 #' Zeitgeber_history=get_article_full_history_table("Zeitgeber")
 #' citations_in_wiki_table=get_regex_citations_in_wiki_table(Zeitgeber_history,doi_regexp)
 #'
-#'
+
 get_regex_citations_in_wiki_table=function(article_wiki_table,citation_regexp){
   citation_fetched=str_match_all(article_wiki_table$`*`, citation_regexp)
 
@@ -414,7 +404,6 @@ df_citation_revid_art=dplyr::select(article_wiki_table,art,revid)%>%dplyr::right
 
 return(df_citation_revid_art)
 }
-
 
 #' Parse Citation Type
 #'
@@ -454,7 +443,6 @@ parse_cite_type=function(citation){
 #' citation_type_extracted=as.character(sapply(extract_citations(art_test[9]),replace_wikihypelinks))
 #'
 #'
-
 
 extract_citations=function(art_text){
   cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
@@ -536,8 +524,6 @@ replace_wikihypelinks=function(art_text){
 #' art_test=get_article_most_recent_table("Zeitgeber")
 #' citation_extracted=parse_article_ALL_citations(art_test[9]))
 #'
-#'
-
 
 parse_article_ALL_citations=function(art_text){
 #art_text=art_test
@@ -558,7 +544,6 @@ parse_article_ALL_citations=function(art_text){
   #dcast(df_out,id_cite~Part1,value.var="Part2")
   return(df_out)
 }
-
 
 #' Get refCount from wikipedia article content
 #'
@@ -660,11 +645,35 @@ get_doi_count=function(art_text){
 #'
 
 get_ISBN_count=function(art_text){
-  ISBN_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]'
+  ISBN_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)[-0-9X ]{13,17}'#'(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]'
   ISBN_fetched=str_match_all(art_text, ISBN_regexp)
   ISBN_count=length(as.character(unlist(ISBN_fetched)))
   return(as.numeric(as.character(ISBN_count)))
 }
+
+#' Get any regex Count from wikipedia article content
+#'
+#' This function get a wikipedia article content and a regular expression as arguments
+#' and return regex count in the text.
+#'
+#' @param art_text text content of wikipedia article
+#' @param regexp regular expression
+#' @return ref_count
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' get_anyCount(art_test[9],'<ref.*?</ref>')
+#'
+
+ get_anyCount=function(art_text,regexp){
+   ref_regexp=regexp
+   ref_fetched=str_match_all(art_text, ref_regexp)
+   ref_count=length(as.character(unlist(ref_fetched)))
+   return(as.numeric(as.character(ref_count)))
+ }
+
+
 
 #' Get SciScore from wikipedia article content
 #'
@@ -766,7 +775,6 @@ Get_source_type_counts=function(art_text){
 #'
 #'
 
-
 get_paresd_citations=function(article_most_recent_table){
 
   df_cite_clean=c()
@@ -809,7 +817,6 @@ get_paresd_citations=function(article_most_recent_table){
 #' tmpwikitable=get_article_initial_table("Zeitgeber")
 #' write_wiki_history_to_xlsx(tmpwikitable,"Zeitgeber")
 
-
 write_wiki_history_to_xlsx=function(wiki_hist,file_name){
   wiki_hist[is.na(wiki_hist)]="-"
   wiki_hist[is.null(wiki_hist)]="-"
@@ -820,11 +827,44 @@ write_wiki_history_to_xlsx=function(wiki_hist,file_name){
 }
 
 
+#' annotate and export DOI list to bibtex file
+#'
+#' This function get a list of DOI as input, annotate it with Rcrossref and export a bibtexfile.
+#' in the working directory.
+#'
+#' @param doi_list list of DOI
+#' @param file_name output file name
+#' @return nothing
+#' @export
+#'
+#' @examples
+#'
+#' category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+#' extracted_citation_table=get_regex_citations_in_wiki_table(category_most_recent, "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+") # doi_regexp
+#' export_doi_to_bib(as.character(extracted_citation_table$citation_fetched)[1:5],"output.bib")
+#'
 
-export_doi_to_bib=function(doi_list,file_name="doi_file_top_high_100520.bib"){
+
+export_doi_to_bib=function(doi_list,file_name="file.bib"){
   dfa=annotate_doi_to_bibtex_cross_ref(doi_list)
   lapply(dfa, function(x) write.table( x, file_name  , append= T, sep='\n\n' ,quote = F,col.names = F,row.names = F))
 }
+
+
+#' Export all regex from Article history Table to multiple xlsx with a
+#'
+#' This function get a wikipedia article table as input and the name of the target xls file.
+#' an xlsx with the table is written in the working directory.
+#'
+#' @param article_most_recent_table wiki history or most recent table of multiple wikipedia pages
+#' @param name_file_prefix output file name prefix
+#' @return nothing
+#' @export
+#'
+#' @examples
+#'
+#' category_most_recent=get_category_articles_most_recent(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+#' export_extracted_citations_xlsx(category_most_recent, "example")
 
 export_extracted_citations_xlsx=function(article_most_recent_table,name_file_prefix){
 
@@ -843,8 +883,292 @@ export_extracted_citations_xlsx=function(article_most_recent_table,name_file_pre
 }
 
 
+#' Annotate DOI List with Eurompmc
+#'
+#' This function get a list of DOIs as input
+#' and create dataframe of annotated DOIs with Eurompmc
+#'
+#' @param doi_list names of wikipedia category
+#' @return dataframe of annotated DOIs with Eurompmc
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
+#' annotate_doi_list_europmc(dois_fetched)
+
+annotate_doi_list_europmc=function(doi_list){
+  annotated_doi_df=c()
+  for(i in 1:length(doi_list)){ #
+    print(i)
+    print(doi_list[i])
+    annotated_dois_df_load=tryCatch(epmc_search(paste("DOI:",doi_list[i],sep="")),error = function(e) NULL)
+    if(is.null(annotated_dois_df_load)){annotated_dois_df_load=tryCatch(epmc_search(doi_list[i]),error = function(e) NULL)}
+    if(is.null(annotated_dois_df_load)){next}
+    if(dim(annotated_dois_df_load)[1]==1){
+      annotated_dois_df_load=dplyr::mutate(annotated_dois_df_load, id = if (exists('id', where = annotated_dois_df_load)) id else NA,
+                                           source = if (exists('source', where = annotated_dois_df_load)) source else NA,
+                                           pmid = if (exists('pmid', where = annotated_dois_df_load)) pmid else NA,
+                                           pmcid = if (exists('pmcid', where = annotated_dois_df_load)) pmcid else NA,
+                                           doi = if (exists('doi', where = annotated_dois_df_load)) doi else NA,
+                                           title = if (exists('title', where = annotated_dois_df_load)) title else NA,
+                                           authorString = if (exists('authorString', where = annotated_dois_df_load)) authorString else NA,
+                                           journalTitle = if (exists('journalTitle', where = annotated_dois_df_load)) journalTitle else NA,
+                                           pubYear = if (exists('pubYear', where = annotated_dois_df_load)) pubYear else NA,
+                                           pubType = if (exists('pubType', where = annotated_dois_df_load)) pubType else NA,
+                                           isOpenAccess = if (exists('isOpenAccess', where = annotated_dois_df_load)) isOpenAccess else NA,
+                                           citedByCount = if (exists('citedByCount', where = annotated_dois_df_load)) citedByCount else NA,
+                                           firstPublicationDate = if (exists('firstPublicationDate', where = annotated_dois_df_load)) firstPublicationDate else NA)
+      annotated_dois_df_load=tryCatch(dplyr::select(annotated_dois_df_load,id,source,pmid,pmcid,doi,title,
+                                                    authorString,journalTitle,pubYear,pubType,isOpenAccess,citedByCount,
+                                                    firstPublicationDate),error = function(e) NULL)
+      if(is.null(annotated_dois_df_load)){next}
+      annotated_doi_df=rbind(annotated_doi_df,annotated_dois_df_load)
+    }
+  }
+  return(data.frame(annotated_doi_df))
+
+}
 
 
+#' Annotate DOI List with CrossRef
+#'
+#' This function get a list of DOIs as input
+#' and create dataframe of annotated DOIs with CrossRef
+#'
+#' @param doi_list names of wikipedia category
+#' @return dataframe of annotated DOIs with CrossRef
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
+#' annotate_doi_list_cross_ref(dois_fetched)
+#'
+
+annotate_doi_list_cross_ref=function(doi_list){
+  doi_bib=cr_cn(dois = doi_list,"bibentry",.progress = "text")
+
+  doi_bib_df=dcast(melt(doi_bib[-(which(lapply(doi_bib,length)==0))]), L1 ~ L2)
+
+  citation_countdf=cr_citation_count(doi = doi_bib_df$doi)
+
+  doi_bib_df=doi_bib_df%>%dplyr::left_join(citation_countdf,by=c("doi"))
+
+  return(doi_bib_df)
+}
+
+#' Annotate DOI List with CrossRef
+#'
+#' This function get a list of DOIs as input
+#' and create a bib of annotated DOIs with CrossRef
+#'
+#' @param doi_list names of wikipedia category
+#' @return bib structure of annotated DOIs with CrossRef
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
+#' annotate_doi_to_bibtex_cross_ref(dois_fetched)
+#'
+
+annotate_doi_to_bibtex_cross_ref=function(doi_list){
+  doi_bib=cr_cn(dois = doi_list,"bibtex",.progress = "text")
+  return(doi_bib)
+}
+
+
+#' Annotate single isbn with google book API
+#'
+#' This function get an ISBN as input
+#' and return a dataframe of annotation DOIs from google book API
+#'
+#' @param isbn_nb ISBN number
+#' @return dataframe of annotation DOIs from google book API
+#' @export
+#'
+#' @examples
+#'
+#'
+#' annotate_isbn_google("978-0-15-603135-6")
+#'
+
+annotate_isbn_google=function(isbn_nb){
+  isbn_nb=gsub("-","",isbn_nb)
+  isbn_nb=gsub(" ","",isbn_nb)
+  cmd=paste("https://www.googleapis.com/books/v1/volumes?q=isbn:",isbn_nb,sep="")
+  resp=GET(cmd)
+  parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
+  tryCatch({
+    if(parsed$totalItems!=0){
+      output_df=parsed$items$volumeInfo[,c("title","publisher","publishedDate","description")]
+      output_df$categories=paste(unlist(parsed$items$volumeInfo$categories),sep=", ",collapse=", ")
+      output_df$authors=paste(unlist(parsed$items$volumeInfo$authors),sep=", ",collapse=", ")
+      return(output_df)}
+  }, error = function(err) {return(NULL)})
+}
+
+
+#' Annotate single isbn with google book API
+#'
+#' This function get an ISBN as input
+#' and return a dataframe of annotation DOIs from google book API
+#'
+#' @param isbn_nb ISBN number
+#' @return dataframe of annotation DOIs from google book API
+#' @export
+#'
+#' @examples
+#'
+#'
+#' annotate_isbn_google("978-0-15-603135-6")
+#'
+
+annotate_isbn_openlib=function(isbn_nb){ # to improve
+  isbn_nb=gsub("-","",isbn_nb)
+  isbn_nb=gsub(" ","",isbn_nb)
+  cmd=paste("https://openlibrary.org/api/books?bibkeys=ISBN",isbn_nb,"&format=json",sep="")
+  resp=GET(cmd)
+  #https://openlibrary.org/books/OL4749139M.json
+  parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
+  tryCatch({
+    return(as.data.frame(parsed))
+  }, error = function(err) {return(NULL)})
+}
+
+
+#' Annotate DOI List with altmetrics
+#'
+#' This function get a list of DOIs as input
+#' and create a dataframe of annotated DOIs with altmetrics
+#'
+#' @param doi_list names of wikipedia category
+#' @return dataframee of annotated DOIs with altmetrics
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
+#' annotate_doi_list_altmetrics(list(unique(as.character(dois_fetched))))
+#'
+
+
+annotate_doi_list_altmetrics=function(doi_list){
+  alm <- function(x)  tryCatch(altmetrics(doi = x) %>% altmetric_data(), error=function(e) NULL)
+  results <- pmap_df(doi_list, alm)
+  results=dplyr::select(results,title,doi,pmid,altmetric_jid,issns,journal,authors1,type,altmetric_id,is_oa,cited_by_fbwalls_count,cited_by_posts_count,cited_by_tweeters_count,cited_by_videos_count,cited_by_feeds_count,cited_by_accounts_count,score ,published_on,added_on,url)
+
+  return(results)
+}
+##anno_dois_altmetrics=annotate_doi_list_altmetrics(list(unique(as.character(doi_30K[1:200,1]))))
+
+#' Annotate ISBN List with altmetrics
+#'
+#' This function get a list of ISBN as input
+#' and create a dataframe of annotated ISBN with altmetrics
+#'
+#' @param doi_list names of wikipedia category
+#' @return dataframee of annotated ISBN with altmetrics
+#' @export
+#'
+#' @examples
+#' art_test=get_article_most_recent_table("Zeitgeber")
+#' isbn_fetched=unique(unlist(str_match_all(art_test$`*`, isbn_regexp)))
+#' annotate_isbn_list_altmetrics(list(unique(as.character(isbn_fetched))))
+#'
+
+annotate_isbn_list_altmetrics=function(isbn_list){
+  alm <- function(x)  tryCatch(altmetrics(isbn = x) %>% altmetric_data(), error=function(e) NULL)
+  results <- pmap_df(isbn_list, alm)
+  return(results)
+}
+
+
+
+
+get_citation_type=function(article_most_recent_table){
+
+  df_cite_type_clean=c()
+
+  for(i in 1:length(article_most_recent_table$revid)){
+
+    print(article_most_recent_table$art[i])
+
+    dfctmp=try(Get_source_type_counts(article_most_recent_table$`*`[i]))
+    try({
+      if(dim(dfctmp)[1]>1){
+        dfctmp$revid=rep(article_most_recent_table$revid[i],dim(dfctmp)[1])
+        df_cite_type_clean=rbind(df_cite_type_clean,dfctmp)
+      }
+    })
+  }
+  df_cite_count_revid_art=dplyr::select(article_most_recent_table,art,revid)%>%dplyr::right_join(df_cite_type_clean,by="revid")
+
+  return(df_cite_count_revid_art)
+}
+
+get_pdfs_top20source=function(df_cite_parsed_revid_art){
+  #pdf("top20source.pdf")
+  for(i in 1:length(source_types_list)){
+    plot_top_source(df_cite_parsed_revid_art,as.character(source_types_list[i]))
+  }
+  #dev.off()
+}
+
+get_top_cited_wiki_papers=function(df_doi_revid_art){
+
+  top_20_wiki_cited_doi=names(tail(sort(table(unique(df_doi_revid_art)$citation_fetched)),40))
+  wikicount=data.frame(tail(sort(table(unique(df_doi_revid_art)$citation_fetched)),40))
+  colnames(wikicount)=c("citation","wiki_count")
+
+  top_20_wiki_cited_doi_annotated=annotate_doi_list_europmc(top_20_wiki_cited_doi)
+
+  top_20_wiki_cited_doi_annotated=top_20_wiki_cited_doi_annotated%>%dplyr::inner_join(wikicount,by=c("doi"="citation"))
+
+  citation_countdf=cr_citation_count(doi = top_20_wiki_cited_doi_annotated$doi)
+
+  top_20_wiki_cited_doi_annotated=top_20_wiki_cited_doi_annotated%>%dplyr::left_join(citation_countdf,by=c("doi"))
+
+  top20_cited_in_wiki_art=df_doi_revid_art%>% dplyr::filter(citation_fetched %in% top_20_wiki_cited_doi_annotated$doi)%>%unique()%>%dplyr::select(citation_fetched,art)%>%
+    group_by(citation_fetched)%>% summarise(cited_in_wiki_art = paste(art, collapse = ", "))
+
+  #top_20_wiki_cited_doi_annotated= top_20_wiki_cited_doi_annotated%>%dplyr::left_join(top20_cited_in_wiki_art,by=c("citation_fetched"="citation"))
+
+  #write.table(top_20_wiki_cited_doi_annotated,"top_20_wiki_cited_doi_annotated_europmc.csv",sep=";",row.names = F)
+
+  return(top_20_wiki_cited_doi_annotated)
+}
+
+# get_top_cited_wiki_papers(df_doi_revid_art)
+
+
+get_tables_initial_most_recent_full_info=function(all_art){
+  #all_art=covid_imp_art
+
+  article_initial_table=c()
+  article_most_recent_table=c()
+  article_info_table=c()
+  article_full_history_table=c()
+
+  for(i in 1:length(all_art)){
+    print(all_art[i])
+    try({
+      article_initial_table=rbind(article_initial_table, get_article_initial_table(all_art[i]))
+      article_most_recent_table=rbind(article_most_recent_table,get_article_most_recent_table(all_art[i]))
+      article_info_table=rbind(article_info_table,get_article_info_table(all_art[i]))
+      article_full_history_table=rbind(article_full_history_table,get_article_full_history_table(all_art[i]))
+    })
+  }
+  return(list(article_initial_table=article_initial_table,article_most_recent_table=article_most_recent_table,article_info_table=article_info_table,article_full_history_table=article_full_history_table))
+}
+
+
+
+
+
+
+# plots examples
 plot_article_creation_per_year=function(article_initial_table,name_title,Cumsum=T){
 
   data_edit_pattern= article_initial_table  #dplyr::select(article_initial_table,art,user,timestamp,size)%>%dplyr::filter(art %in% art_sci_of_int)
@@ -955,220 +1279,7 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 }
 
 
-#' Annotate DOI List with Eurompmc
-#'
-#' This function get a list of DOIs as input
-#' and create dataframe of annotated DOIs with Eurompmc
-#'
-#' @param doi_list names of wikipedia category
-#' @return dataframe of annotated DOIs with Eurompmc
-#' @export
-#'
-#' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
-#' annotate_doi_list_europmc(dois_fetched)
 
-annotate_doi_list_europmc=function(doi_list){
-  annotated_doi_df=c()
-  for(i in 1:length(doi_list)){ #
-    print(i)
-    print(doi_list[i])
-    annotated_dois_df_load=tryCatch(epmc_search(paste("DOI:",doi_list[i],sep="")),error = function(e) NULL)
-    if(is.null(annotated_dois_df_load)){annotated_dois_df_load=tryCatch(epmc_search(doi_list[i]),error = function(e) NULL)}
-    if(is.null(annotated_dois_df_load)){next}
-    if(dim(annotated_dois_df_load)[1]==1){
-      annotated_dois_df_load=dplyr::mutate(annotated_dois_df_load, id = if (exists('id', where = annotated_dois_df_load)) id else NA,
-                                           source = if (exists('source', where = annotated_dois_df_load)) source else NA,
-                                           pmid = if (exists('pmid', where = annotated_dois_df_load)) pmid else NA,
-                                           pmcid = if (exists('pmcid', where = annotated_dois_df_load)) pmcid else NA,
-                                           doi = if (exists('doi', where = annotated_dois_df_load)) doi else NA,
-                                           title = if (exists('title', where = annotated_dois_df_load)) title else NA,
-                                           authorString = if (exists('authorString', where = annotated_dois_df_load)) authorString else NA,
-                                           journalTitle = if (exists('journalTitle', where = annotated_dois_df_load)) journalTitle else NA,
-                                           pubYear = if (exists('pubYear', where = annotated_dois_df_load)) pubYear else NA,
-                                           pubType = if (exists('pubType', where = annotated_dois_df_load)) pubType else NA,
-                                           isOpenAccess = if (exists('isOpenAccess', where = annotated_dois_df_load)) isOpenAccess else NA,
-                                           citedByCount = if (exists('citedByCount', where = annotated_dois_df_load)) citedByCount else NA,
-                                           firstPublicationDate = if (exists('firstPublicationDate', where = annotated_dois_df_load)) firstPublicationDate else NA)
-      annotated_dois_df_load=tryCatch(dplyr::select(annotated_dois_df_load,id,source,pmid,pmcid,doi,title,
-                                                    authorString,journalTitle,pubYear,pubType,isOpenAccess,citedByCount,
-                                                    firstPublicationDate),error = function(e) NULL)
-      if(is.null(annotated_dois_df_load)){next}
-      annotated_doi_df=rbind(annotated_doi_df,annotated_dois_df_load)
-    }
-  }
-  return(data.frame(annotated_doi_df))
-
-}
-
-
-#' Annotate DOI List with CrossRef
-#'
-#' This function get a list of DOIs as input
-#' and create dataframe of annotated DOIs with CrossRef
-#'
-#' @param doi_list names of wikipedia category
-#' @return dataframe of annotated DOIs with CrossRef
-#' @export
-#'
-#' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' dois_fetched=unique(unlist(str_match_all(art_test$`*`, doi_regexp)))
-#' annotate_doi_list_cross_ref(dois_fetched)
-#'
-
-annotate_doi_list_cross_ref=function(doi_list){
-  doi_bib=cr_cn(dois = doi_list,"bibentry",.progress = "text")
-
-  doi_bib_df=dcast(melt(doi_bib[-(which(lapply(doi_bib,length)==0))]), L1 ~ L2)
-
-  citation_countdf=cr_citation_count(doi = doi_bib_df$doi)
-
-  doi_bib_df=doi_bib_df%>%dplyr::left_join(citation_countdf,by=c("doi"))
-
-  return(doi_bib_df)
-}
-
-annotate_doi_to_bibtex_cross_ref=function(doi_list){
-  doi_bib=cr_cn(dois = doi_list,"bibtex",.progress = "text")
-  return(doi_bib)
-}
-
-annotate_isbn_google=function(isbn_nb){
-  isbn_nb=gsub("-","",isbn_nb)
-  cmd=paste("https://www.googleapis.com/books/v1/volumes?q=isbn:",isbn_nb,sep="")
-  resp=GET(cmd)
-  parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
-  tryCatch({
-    if(parsed$totalItems!=0){
-      output_df=parsed$items$volumeInfo[,c("title","publisher","publishedDate","description")]
-      output_df$categories=paste(unlist(parsed$items$volumeInfo$categories),sep=", ",collapse=", ")
-      output_df$authors=paste(unlist(parsed$items$volumeInfo$authors),sep=", ",collapse=", ")
-      return(output_df)}
-  }, error = function(err) {return(NULL)})
-}
-
-
-annotate_doi_list_altmetrics=function(doi_list){
-  alm <- function(x)  tryCatch(altmetrics(doi = x) %>% altmetric_data(), error=function(e) NULL)
-  results <- pmap_df(doi_list, alm)
-  results=dplyr::select(results,title,doi,pmid,altmetric_jid,issns,journal,authors1,type,altmetric_id,is_oa,cited_by_fbwalls_count,cited_by_posts_count,cited_by_tweeters_count,cited_by_videos_count,cited_by_feeds_count,cited_by_accounts_count,score ,published_on,added_on,url)
-
-  return(results)
-}
-##anno_dois_altmetrics=annotate_doi_list_altmetrics(list(unique(as.character(doi_30K[1:200,1]))))
-
-annotate_isbn_list_altmetrics=function(isbn_list){
-  alm <- function(x)  tryCatch(altmetrics(isbn = x) %>% altmetric_data(), error=function(e) NULL)
-  results <- pmap_df(isbn_list, alm)
-  return(results)
-}
-
-
-
-annotate_isbn_openlib=function(isbn_nb){
-  isbn_nb=gsub("-","",isbn_nb)
-  isbn_nb=gsub(" ","",isbn_nb)
-  cmd=paste("https://openlibrary.org/api/books?bibkeys=ISBN",isbn_nb,"&format=json",sep="")
-  resp=GET(cmd)
-  parsed <- jsonlite::fromJSON(httr::content(resp, "text"), simplifyVector = T)
-  tryCatch({
-    return(as.data.frame(parsed))
-  }, error = function(err) {return(NULL)})
-}
-
-get_citation_type=function(article_most_recent_table){
-
-  df_cite_type_clean=c()
-
-  for(i in 1:length(article_most_recent_table$revid)){
-
-    print(article_most_recent_table$art[i])
-
-    dfctmp=try(Get_source_type_counts(article_most_recent_table$`*`[i]))
-    try({
-      if(dim(dfctmp)[1]>1){
-        dfctmp$revid=rep(article_most_recent_table$revid[i],dim(dfctmp)[1])
-        df_cite_type_clean=rbind(df_cite_type_clean,dfctmp)
-      }
-    })
-  }
-  df_cite_count_revid_art=dplyr::select(article_most_recent_table,art,revid)%>%dplyr::right_join(df_cite_type_clean,by="revid")
-
-  return(df_cite_count_revid_art)
-}
-
-  get_pdfs_top20source=function(df_cite_parsed_revid_art){
-    #pdf("top20source.pdf")
-    for(i in 1:length(source_types_list)){
-      plot_top_source(df_cite_parsed_revid_art,as.character(source_types_list[i]))
-    }
-    #dev.off()
-  }
-
-  get_top_cited_wiki_papers=function(df_doi_revid_art){
-
-    top_20_wiki_cited_doi=names(tail(sort(table(unique(df_doi_revid_art)$citation_fetched)),40))
-    wikicount=data.frame(tail(sort(table(unique(df_doi_revid_art)$citation_fetched)),40))
-    colnames(wikicount)=c("citation","wiki_count")
-
-    top_20_wiki_cited_doi_annotated=annotate_doi_list_europmc(top_20_wiki_cited_doi)
-
-    top_20_wiki_cited_doi_annotated=top_20_wiki_cited_doi_annotated%>%dplyr::inner_join(wikicount,by=c("doi"="citation"))
-
-    citation_countdf=cr_citation_count(doi = top_20_wiki_cited_doi_annotated$doi)
-
-    top_20_wiki_cited_doi_annotated=top_20_wiki_cited_doi_annotated%>%dplyr::left_join(citation_countdf,by=c("doi"))
-
-    top20_cited_in_wiki_art=df_doi_revid_art%>% dplyr::filter(citation_fetched %in% top_20_wiki_cited_doi_annotated$doi)%>%unique()%>%dplyr::select(citation_fetched,art)%>%
-      group_by(citation_fetched)%>% summarise(cited_in_wiki_art = paste(art, collapse = ", "))
-
-    #top_20_wiki_cited_doi_annotated= top_20_wiki_cited_doi_annotated%>%dplyr::left_join(top20_cited_in_wiki_art,by=c("citation_fetched"="citation"))
-
-    #write.table(top_20_wiki_cited_doi_annotated,"top_20_wiki_cited_doi_annotated_europmc.csv",sep=";",row.names = F)
-
-    return(top_20_wiki_cited_doi_annotated)
-  }
-
- # get_top_cited_wiki_papers(df_doi_revid_art)
-
-
-  get_tables_initial_most_recent_full_info=function(all_art){
-    #all_art=covid_imp_art
-
-    article_initial_table=c()
-    article_most_recent_table=c()
-    article_info_table=c()
-    article_full_history_table=c()
-
-    for(i in 1:length(all_art)){
-      print(all_art[i])
-      try({
-        article_initial_table=rbind(article_initial_table, get_article_initial_table(all_art[i]))
-        article_most_recent_table=rbind(article_most_recent_table,get_article_most_recent_table(all_art[i]))
-        article_info_table=rbind(article_info_table,get_article_info_table(all_art[i]))
-        article_full_history_table=rbind(article_full_history_table,get_article_full_history_table(all_art[i]))
-      })
-    }
-    return(list(article_initial_table=article_initial_table,article_most_recent_table=article_most_recent_table,article_info_table=article_info_table,article_full_history_table=article_full_history_table))
-  }
-
-
-
-  plot_venn_from_two_list=function(listA,listB,colors_2=c("red", "blue")){
-
-    grid.newpage()
-    venn.plot <- draw.pairwise.venn(
-      length(unlist(listA)),length(unlist(listB)),length(intersect(unlist(listA),unlist(listB))),
-      euler.d = TRUE,
-      sep.dist = 0.03,col=c(NA,NA),
-      rotation.degree = 0,category   = c(names(listA),names(listB)),fill=colors_2,
-      lty             = 1, alpha     = 0.2,cex = rep(3, 3),cat.cex=c(3,3)
-    )
-
-    grid.draw(venn.plot)
-  }
 
 
   page_view_plot=function(article_name,ymax=NA,start="2020010100",end="2020050100"){
@@ -1194,52 +1305,6 @@ get_citation_type=function(article_most_recent_table){
     print(Pl)
   }
 
-  padNA <- function (mydata, rowsneeded, first = TRUE)
-  {
-    temp1 = colnames(mydata)
-    rowsneeded = rowsneeded - nrow(mydata)
-    temp2 = setNames(
-      data.frame(matrix(rep(NA, length(temp1) * rowsneeded),
-                        ncol = length(temp1))), temp1)
-    if (isTRUE(first)) rbind(mydata, temp2)
-    else rbind(temp2, mydata)
-  }
-
-  dotnames <- function(...) {
-    vnames <- as.list(substitute(list(...)))[-1L]
-    vnames <- unlist(lapply(vnames,deparse), FALSE, FALSE)
-    vnames
-  }
-
-  Cbind <- function(..., first = TRUE) {
-    Names <- dotnames(...)
-    datalist <- setNames(list(...), Names)
-    nrows <- max(sapply(datalist, function(x)
-      ifelse(is.null(dim(x)), length(x), nrow(x))))
-    datalist <- lapply(seq_along(datalist), function(x) {
-      z <- datalist[[x]]
-      if (is.null(dim(z))) {
-        z <- setNames(data.frame(z), Names[x])
-      } else {
-        if (is.null(colnames(z))) {
-          colnames(z) <- paste(Names[x], sequence(ncol(z)), sep = "_")
-        } else {
-          colnames(z) <- paste(Names[x], colnames(z), sep = "_")
-        }
-      }
-      padNA(z, rowsneeded = nrows, first = first)
-    })
-    do.call(cbind, datalist)
-  }
-
-  # get_anyCount=function(art_text,regexp){
-  #   ref_regexp=regexp
-  #   ref_fetched=str_match_all(art_text, ref_regexp)
-  #   ref_count=length(as.character(unlist(ref_fetched)))
-  #   return(as.numeric(as.character(ref_count)))
-  # }
-  #
-  # regexp_list
 
   plot_top_source=function(df_cite_parsed_revid_art,source_type){
 

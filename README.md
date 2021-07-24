@@ -179,7 +179,6 @@ We can get similar informations and impact of the publication from the R Altmetr
 - Exports 
 - Visualisation examples
 
-
 *Note that this package is still under development. Please contact me (jsobel83@gmail.com) if you want to contribute.*
 
 
