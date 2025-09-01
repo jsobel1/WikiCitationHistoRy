@@ -4,10 +4,12 @@
 \alias{get_article_info_table}
 \title{Get Article Informations Table}
 \usage{
-get_article_info_table(article_name)
+get_article_info_table(article_name, date_an = "2020-05-01T00:00:00Z")
 }
 \arguments{
 \item{article_name}{Path to the input file}
+
+\item{date_an}{input date to select most recent version}
 }
 \value{
 A table with the initial revision of the wikipedia article

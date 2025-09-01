@@ -383,11 +383,12 @@ pkg.env$regexp_list=c(
 #'
 #' cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
 #'
-#' @param rticle_wiki_table a wiki table
-#' @param citation_regexp citation regular expression
+#' @param article_wiki_table A data frame of Wikipedia revisions.
+#' @param citation_regexp A regular expression used to locate citations.
 #'
 #'
-#' @return list of wikipedia pages in the input category
+#' @return A data frame mapping each revision to the citations matching
+#'   `citation_regexp`.
 #' @export
 #'
 #' @examples
@@ -1010,20 +1011,18 @@ annotate_isbn_google=function(isbn_nb){
 }
 
 
-#' Annotate single isbn with google book API
+#' Annotate single ISBN with Open Library
 #'
-#' This function get an ISBN as input
-#' and return a dataframe of annotation DOIs from google book API
+#' This function retrieves metadata for a given ISBN using the Open
+#' Library API.
 #'
 #' @param isbn_nb ISBN number
-#' @return dataframe of annotation DOIs from google book API
+#' @return A data frame with the Open Library response or \code{NULL} if
+#'   the ISBN is not found.
 #' @export
 #'
 #' @examples
-#'
-#'
-#' annotate_isbn_google("978-0-15-603135-6")
-#'
+#' annotate_isbn_openlib("9780156031356")
 
 annotate_isbn_openlib=function(isbn_nb){ # to improve
   isbn_nb=gsub("-","",isbn_nb)
@@ -1086,6 +1085,18 @@ annotate_isbn_list_altmetrics=function(isbn_list){
 
 
 
+#' Get citation type counts
+#'
+#' This function summarises citation types for each article in a table of
+#' most recent revisions.
+#'
+#' @param article_most_recent_table Wikipedia revisions table.
+#' @return A data frame of citation type counts per article.
+#' @export
+#'
+#' @examples
+#' art <- get_article_most_recent_table("Zeitgeber")
+#' get_citation_type(art)
 
 get_citation_type=function(article_most_recent_table){
 
@@ -1108,6 +1119,19 @@ get_citation_type=function(article_most_recent_table){
   return(df_cite_count_revid_art)
 }
 
+#' Plot top citation sources
+#'
+#' Generates bar plots of the top 20 values for each citation source type
+#' present in a parsed citation table.
+#'
+#' @param df_cite_parsed_revid_art Parsed citation data frame.
+#' @return No return value, called for side effects.
+#' @export
+#'
+#' @examples
+#' df <- get_paresd_citations(get_category_articles_most_recent("Zeitgeber"))
+#' get_pdfs_top20source(df)
+
 get_pdfs_top20source=function(df_cite_parsed_revid_art){
   #pdf("top20source.pdf")
   for(i in 1:length(source_types_list)){
@@ -1115,6 +1139,20 @@ get_pdfs_top20source=function(df_cite_parsed_revid_art){
   }
   #dev.off()
 }
+
+#' Get top cited Wikipedia papers
+#'
+#' Identifies the most frequently cited DOIs and annotates them with
+#' bibliographic information.
+#'
+#' @param df_doi_revid_art Data frame linking DOIs to Wikipedia articles.
+#' @return A data frame of the top cited DOIs with annotations.
+#' @export
+#'
+#' @examples
+#' df <- get_regex_citations_in_wiki_table(get_article_most_recent_table("Zeitgeber"),
+#'                                         "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+")
+#' get_top_cited_wiki_papers(df)
 
 get_top_cited_wiki_papers=function(df_doi_revid_art){
 
@@ -1143,6 +1181,20 @@ get_top_cited_wiki_papers=function(df_doi_revid_art){
 # get_top_cited_wiki_papers(df_doi_revid_art)
 
 
+#' Retrieve article tables for multiple titles
+#'
+#' Fetches initial, most recent, info and full history tables for each
+#' article in a vector of titles.
+#'
+#' @param all_art Character vector of article titles.
+#' @return A list with four elements: \code{article_initial_table},
+#'   \code{article_most_recent_table}, \code{article_info_table} and
+#'   \code{article_full_history_table}.
+#' @export
+#'
+#' @examples
+#' get_tables_initial_most_recent_full_info(c("Zeitgeber"))
+
 get_tables_initial_most_recent_full_info=function(all_art){
   #all_art=covid_imp_art
 
@@ -1168,7 +1220,20 @@ get_tables_initial_most_recent_full_info=function(all_art){
 
 
 
-# plots examples
+#' Plot article creation over time
+#'
+#' Creates a cumulative or per-year plot of article creation dates.
+#'
+#' @param article_initial_table Table of initial revisions for articles.
+#' @param name_title Plot title.
+#' @param Cumsum Logical indicating whether to plot cumulative counts.
+#' @return No return value, generates a plot.
+#' @export
+#'
+#' @examples
+#' initial <- get_article_initial_table("Zeitgeber")
+#' plot_article_creation_per_year(initial, "Zeitgeber")
+
 plot_article_creation_per_year=function(article_initial_table,name_title,Cumsum=T){
 
   data_edit_pattern= article_initial_table  #dplyr::select(article_initial_table,art,user,timestamp,size)%>%dplyr::filter(art %in% art_sci_of_int)
@@ -1195,6 +1260,18 @@ if(Cumsum==T){
   ggplot(dfcr_bin, aes(x = date,y=count)) +scale_x_date()+ geom_point()+ geom_line()+ggtitle(name_title)+theme_classic()
 }
   }
+
+#' Plot static article timeline
+#'
+#' Displays article creation dates in a static ggplot timeline.
+#'
+#' @param article_initial_table_sel Subset of initial article table.
+#' @return No return value, generates a plot.
+#' @export
+#'
+#' @examples
+#' initial <- get_article_initial_table("Zeitgeber")
+#' plot_static_timeline(initial)
 
 plot_static_timeline=function(article_initial_table_sel){
 
@@ -1225,6 +1302,20 @@ plot_static_timeline=function(article_initial_table_sel){
 
   print(P1)
 }
+
+#' Plot interactive article timeline
+#'
+#' Creates an interactive timevis timeline linking to articles.
+#'
+#' @param article_initial_table_sel Subset of initial article table.
+#' @param article_info_table Table with article page information.
+#' @return No return value, launches a Shiny app.
+#' @export
+#'
+#' @examples
+#' initial <- get_article_initial_table("Zeitgeber")
+#' info <- get_article_info_table("Zeitgeber")
+#' plot_navi_timeline(initial, info)
 
 plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 
@@ -1282,6 +1373,21 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 
 
 
+#' Plot page views
+#'
+#' Generates an area plot of Wikipedia page views over time for a given
+#' article.
+#'
+#' @param article_name Wikipedia article title.
+#' @param ymax Optional y-axis maximum.
+#' @param start Start date in YYYYMMDDHH format.
+#' @param end End date in YYYYMMDDHH format.
+#' @return No return value, generates a plot.
+#' @export
+#'
+#' @examples
+#' page_view_plot("Zeitgeber")
+
   page_view_plot=function(article_name,ymax=NA,start="2020010100",end="2020050100"){
     page_view=data.frame(article_pageviews(project = "en.wikipedia", article = article_name,start=start,end=end))
 
@@ -1291,6 +1397,20 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
       scale_y_continuous(limits=c(0,ymax),expand=c(0,0))+scale_x_date(limits=c(as.Date(as.POSIXlt("2020010100",format="%Y%m%d%H",ts="GMT")),as.Date(as.POSIXlt("2020050100",format="%Y%m%d%H",ts="GMT"))))
     print(Pl)
   }
+
+#' Plot page edits
+#'
+#' Displays the number of edits per week for a given article.
+#'
+#' @param article_name Wikipedia article title.
+#' @param ymax Optional y-axis maximum.
+#' @param start Start date in YYYYMMDDHH format.
+#' @param end End date in YYYYMMDDHH format.
+#' @return No return value, generates a plot.
+#' @export
+#'
+#' @examples
+#' page_edit_plot("Zeitgeber")
 
   page_edit_plot=function(article_name,ymax=NA,start="2020010100",end="2020050100"){
     history=get_article_full_history_table(article_name)
@@ -1306,6 +1426,19 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
   }
 
 
+#' Plot top values for a citation variable
+#'
+#' Displays the top 20 occurrences of a given citation variable.
+#'
+#' @param df_cite_parsed_revid_art Parsed citation data frame.
+#' @param source_type Citation variable to summarise.
+#' @return No return value, generates a plot.
+#' @export
+#'
+#' @examples
+#' df <- get_paresd_citations(get_category_articles_most_recent("Zeitgeber"))
+#' plot_top_source(df, "publisher")
+
   plot_top_source=function(df_cite_parsed_revid_art,source_type){
 
     #publisher
@@ -1317,6 +1450,18 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
     print(P1)
   }
 
+#' Plot distribution of citation source types
+#'
+#' Creates a boxplot showing counts of selected citation types.
+#'
+#' @param df_cite_count_revid_art Data frame of citation type counts.
+#' @return No return value, generates a plot.
+#' @export
+#'
+#' @examples
+#' df <- get_citation_type(get_article_most_recent_table("Zeitgeber"))
+#' plot_distribution_source_type(df)
+
   plot_distribution_source_type=function(df_cite_count_revid_art){
     P1=df_cite_count_revid_art%>%dplyr::filter(cite_type %in% c("journal","news","web","book"))%>%dplyr::group_by(revid,cite_type,Freq)%>%
       ggplot(aes(cite_type,Freq))+ geom_boxplot(width=0.6)+coord_flip() #geom_violin(trim = F)+
@@ -1324,7 +1469,18 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
   }
 
 
-###########
+#' Retrieve subcategories
+#'
+#' Returns a table of subcategories for a given Wikipedia category.
+#'
+#' @param catname Category name.
+#' @param replecement Character replacement for spaces.
+#' @return Data frame of subcategories.
+#' @export
+#'
+#' @examples
+#' get_subcat_table("Category:Biology")
+
   get_subcat_table=function(catname,replecement="_"){#catname,depth_cat
     cat_table=c()
     catname=gsub("Category:","",catname)
@@ -1347,7 +1503,19 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
     return(cat_table)
   }
 
-  #test=get_subcat_table("Category:Impact of the COVID-19 pandemic on sports")
+# test=get_subcat_table("Category:Impact of the COVID-19 pandemic on sports")
+
+#' Retrieve pages in a category
+#'
+#' Returns a table of pages that belong to a specific Wikipedia category.
+#'
+#' @param catname Category name.
+#' @param replecement Character replacement for spaces.
+#' @return Data frame of pages in the category.
+#' @export
+#'
+#' @examples
+#' get_pages_in_cat_table("Category:Biology")
 
   get_pages_in_cat_table=function(catname,replecement="_"){#catname,depth_cat
     cat_table=c()
@@ -1371,6 +1539,16 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
     return(cat_table)
   }
 
+#' Retrieve subcategories for multiple categories
+#'
+#' @param catlist Vector of category names.
+#' @param replecement Character replacement for spaces.
+#' @return Combined data frame of subcategories.
+#' @export
+#'
+#' @examples
+#' get_subcat_multiple(c("Category:Biology"))
+
   get_subcat_multiple=function(catlist,replecement="_"){
     cat_table_list=c()
     for(i in 1:length(catlist)){
@@ -1383,6 +1561,16 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
 
  # get_subcat_multiple(test$title)
 
+#' Retrieve pages for multiple categories
+#'
+#' @param catlist Vector of category names.
+#' @param replecement Character replacement for spaces.
+#' @return Combined data frame of pages.
+#' @export
+#'
+#' @examples
+#' get_page_in_cat_multiple(c("Category:Biology"))
+
   get_page_in_cat_multiple=function(catlist,replecement="_"){
     cat_table_list=c()
     for(i in 1:length(catlist)){
@@ -1393,6 +1581,19 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
     return(cat_table_list)
   }
 
+#' Retrieve subcategories with depth
+#'
+#' Recursively fetches subcategories up to a specified depth.
+#'
+#' @param catname Category name.
+#' @param depth Depth to traverse.
+#' @param replecement Character replacement for spaces.
+#' @return Data frame of subcategories up to the desired depth.
+#' @export
+#'
+#' @examples
+#' get_subcat_with_depth("Category:Biology", 1)
+
   get_subcat_with_depth=function(catname,depth,replecement="_"){
     table_out=get_subcat_table(catname)
     while(depth>0){
@@ -1401,6 +1602,18 @@ plot_navi_timeline=function(article_initial_table_sel,article_info_table){
     }
     return(unique(table_out))
   }
+#' Extract citations using multiple patterns
+#'
+#' Applies each regular expression stored in \code{pkg.env$regexp_list} to a
+#' table of article revisions.
+#'
+#' @param article_most_recent_table Table of article revisions.
+#' @return A named list of data frames of matched citations.
+#' @export
+#'
+#' @examples
+#' art <- get_article_most_recent_table("Zeitgeber")
+#' extract_citations_regexp(art)
 
   extract_citations_regexp=function(article_most_recent_table){
     extracted_citation_list=list()

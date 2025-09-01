@@ -7,12 +7,13 @@
 get_regex_citations_in_wiki_table(article_wiki_table, citation_regexp)
 }
 \arguments{
-\item{citation_regexp}{citation regular expression}
+\item{article_wiki_table}{A data frame of Wikipedia revisions.}
 
-\item{rticle_wiki_table}{a wiki table}
+\item{citation_regexp}{A regular expression used to locate citations.}
 }
 \value{
-list of wikipedia pages in the input category
+A data frame mapping each revision to the citations matching
+  `citation_regexp`.
 }
 \description{
 This function get a regex of citations type and a wikipedia article table as input
@@ -23,7 +24,7 @@ accessible regular expression
 
 doi_regexp= "10\\.\\d{4,9}/[-._;()/:a-z0-9A-Z]+"
 
-isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]'
+isbn_regexp='(?<=(isbn|ISBN)\\s?[=:]?\\s?)[-0-9X ]{13,17}'# '(?<=(isbn|ISBN)\\s?[=:]?\\s?)\\d{1,5}-\\d{1,7}-\\d{1,5}-[\\dX]'
 
 url_regexp = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
@@ -47,13 +48,14 @@ book_regexp='\\{\\{cite book .*?\\}\\}'
 
 pmid_regexp="(?<=(pmid|PMID)\\s?[=:]\\s?)\\d{5,9}"
 
-ref_regexp='<ref>\\{\\{[c|C]ite.*?\\}\\}</ref>' # in-text refs!
+ref_in_text_regexp='<ref>\\{\\{.*?\\}\\}</ref>' # in-text refs!
+
+ref_regexp='<ref.*?</ref>'
 
 cite_regexp='\\{\\{[c|C]ite.*?\\}\\}'
 }
 \examples{
 Zeitgeber_history=get_article_full_history_table("Zeitgeber")
 citations_in_wiki_table=get_regex_citations_in_wiki_table(Zeitgeber_history,doi_regexp)
-
 
 }

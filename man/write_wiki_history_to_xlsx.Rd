@@ -12,10 +12,11 @@ write_wiki_history_to_xlsx(wiki_hist, file_name)
 \item{file_name}{output file name prefix}
 }
 \value{
-A table with the last revision of the wikipedia article
+nothing
 }
 \description{
-This function get a wikipedia article table as input and the name of the target xls file
+This function get a wikipedia article table as input and the name of the target xls file.
+an xlsx with the table is written in the working directory.
 }
 \examples{
 
