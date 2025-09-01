@@ -1,37 +1,42 @@
 Package: WikiCitationHistoRy
 Title: a library to parse wikipedia article history citation content
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "Jonathan",
            family = "Sobel",
            role = c("aut", "cre"),
            email = "jsobel83@gmail.com",
            comment = c(ORCID = "0000-0002-5111-4070"))
+Author: Jonathan Sobel [aut, cre]
+Maintainer: Jonathan Sobel <jsobel83@gmail.com>
 Description: WikiCitationHistoRy is a library that allows to parse english wikipedia article history and extract references of any kind, such as doi, website, news, isbn and more.
-License: CC BY-NC
+License: GPL-3
+URL: https://github.com/jsobel1/WikiCitationHistoRy
+BugReports: https://github.com/jsobel1/WikiCitationHistoRy/issues
 Encoding: UTF-8
 LazyData: true
 Imports:
-	XML,
-	dplyr,
-	reshape,
-	textreuse,
-	xlsx,
-	lubridate,
-	httr,
-	rJava,
-	WikipediR,
-	jsonlite,
-	curl,
-	lubridate,
-	ggplot2,
-	scales,
-	gridExtra,
-	rcrossref,
-	timevis,
-	ggridges,
-	reshape2,
-	stringr,
-	europepmc,
-	textclean
+        curl,
+        dplyr,
+        europepmc,
+        ggplot2,
+        ggridges,
+        gridExtra,
+        httr,
+        jsonlite,
+        lubridate,
+        rcrossref,
+        reshape,
+        reshape2,
+        rJava,
+        scales,
+        stringr,
+        textclean,
+        textreuse,
+        timevis,
+        WikipediR,
+        xlsx,
+        XML
+Suggests:
+        testthat (>= 3.0.0)
 RoxygenNote: 7.3.1
