@@ -19,7 +19,7 @@ This function get a wikipedia article content and a regular expression as argume
 and return regex count in the text.
 }
 \examples{
-art_test=get_article_most_recent_table("Zeitgeber")
-get_anyCount(art_test[9],'<ref.*?</ref>')
+ text <- "<ref>Example</ref>"
+ get_anyCount(text,'<ref.*?</ref>')
 
 }

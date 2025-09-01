@@ -17,7 +17,7 @@ This function get a wikipedia article content
 and return doi count
 }
 \examples{
-art_test=get_article_most_recent_table("Zeitgeber")
-get_doi_count(art_test[9])
+ text <- "Reference with DOI 10.1000/xyz123"
+ get_doi_count(text)
 
 }

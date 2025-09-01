@@ -17,7 +17,7 @@ This function get a wikipedia article content
 and return ISBN count
 }
 \examples{
-art_test=get_article_most_recent_table("Zeitgeber")
-get_ISBN_count(art_test[9])
+ text <- "ISBN 978-3-16-148410-0 mentioned"
+ get_ISBN_count(text)
 
 }

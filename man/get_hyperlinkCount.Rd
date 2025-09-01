@@ -17,7 +17,7 @@ This function get a wikipedia article content
 and return hyperlinkCount
 }
 \examples{
-art_test=get_article_most_recent_table("Zeitgeber")
-get_hyperlinkCount(art_test[9])
+ text <- "[[Link]]"
+ get_hyperlinkCount(text)
 
 }

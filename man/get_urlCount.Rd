@@ -17,7 +17,7 @@ This function get a wikipedia article content
 and return urlCount
 }
 \examples{
-art_test=get_article_most_recent_table("Zeitgeber")
-get_urlCount(art_test[9])
+ text <- "Visit http://example.com"
+ get_urlCount(text)
 
 }

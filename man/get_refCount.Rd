@@ -17,7 +17,7 @@ This function get a wikipedia article content
 and return refCount
 }
 \examples{
-art_test=get_article_most_recent_table("Zeitgeber")
-get_refCount(art_test[9])
+ text <- "<ref>Example</ref>"
+ get_refCount(text)
 
 }

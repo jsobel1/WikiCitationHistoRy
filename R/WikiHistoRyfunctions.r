@@ -556,8 +556,8 @@ parse_article_ALL_citations=function(art_text){
 #' @export
 #'
 #' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' get_refCount(art_test[9])
+#' text <- "<ref>Example</ref>"
+#' get_refCount(text)
 #'
 
 get_refCount=function(art_text){
@@ -577,8 +577,8 @@ get_refCount=function(art_text){
 #' @export
 #'
 #' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' get_urlCount(art_test[9])
+#' text <- "Visit http://example.com"
+#' get_urlCount(text)
 #'
 
 get_urlCount=function(art_text){
@@ -598,8 +598,8 @@ get_urlCount=function(art_text){
 #' @export
 #'
 #' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' get_hyperlinkCount(art_test[9])
+#' text <- "[[Link]]"
+#' get_hyperlinkCount(text)
 #'
 
 get_hyperlinkCount=function(art_text){
@@ -620,8 +620,8 @@ get_hyperlinkCount=function(art_text){
 #' @export
 #'
 #' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' get_doi_count(art_test[9])
+#' text <- "Reference with DOI 10.1000/xyz123"
+#' get_doi_count(text)
 #'
 
 get_doi_count=function(art_text){
@@ -641,8 +641,8 @@ get_doi_count=function(art_text){
 #' @export
 #'
 #' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' get_ISBN_count(art_test[9])
+#' text <- "ISBN 978-3-16-148410-0 mentioned"
+#' get_ISBN_count(text)
 #'
 
 get_ISBN_count=function(art_text){
@@ -663,8 +663,8 @@ get_ISBN_count=function(art_text){
 #' @export
 #'
 #' @examples
-#' art_test=get_article_most_recent_table("Zeitgeber")
-#' get_anyCount(art_test[9],'<ref.*?</ref>')
+#' text <- "<ref>Example</ref>"
+#' get_anyCount(text,'<ref.*?</ref>')
 #'
 
  get_anyCount=function(art_text,regexp){

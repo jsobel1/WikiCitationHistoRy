@@ -1,0 +1,48 @@
+---
+title: "Workflow example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Workflow example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(WikiCitationHistoRy)
+```
+
+## Retrieve article history
+
+```{r}
+mock_history <- data.frame(
+  art = "Demo",
+  revid = 1:2,
+  parentid = c(NA,1),
+  user = c("u1","u2"),
+  userid = c(1,2),
+  timestamp = c("2020-01-01","2020-02-01"),
+  size = c(100,110),
+  comment = c("init","update"),
+  `*` = c(
+    "Initial text with doi 10.1000/xyz123",
+    "Updated text with <ref>{{cite web|url=http://example.com}}</ref>"
+  )
+)
+mock_history
+```
+
+## Parse citations
+
+```{r}
+citations <- get_regex_citations_in_wiki_table(mock_history, pkg.env$doi_regexp)
+citations
+```
+
+## Aggregate metrics
+
+```{r}
+refCount <- get_refCount(mock_history$`*`[2])
+urlCount <- get_urlCount(mock_history$`*`[2])
+refCount
+urlCount
+```
