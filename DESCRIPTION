@@ -1,12 +1,14 @@
 Package: WikiCitationHistoRy
 Title: a library to parse wikipedia article history citation content
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "Jonathan",
            family = "Sobel",
            role = c("aut", "cre"),
            email = "jsobel83@gmail.com",
            comment = c(ORCID = "0000-0002-5111-4070"))
+Author: Jonathan Sobel [aut, cre]
+Maintainer: Jonathan Sobel <jsobel83@gmail.com>
 Description: WikiCitationHistoRy is a library that allows to parse english wikipedia article history and extract references of any kind, such as doi, website, news, isbn and more.
 License: CC BY-NC
 Encoding: UTF-8
@@ -35,3 +37,7 @@ Imports:
 	europepmc,
 	textclean
 RoxygenNote: 7.3.1
+Collate:
+    'article_history.R'
+    'citation_parsing.R'
+    'utilities.R'
