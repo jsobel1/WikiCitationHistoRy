@@ -14,7 +14,7 @@ SciScore
 }
 \description{
 This function get a wikipedia article content
-and return SciScore
+and return SciScore from citation template journal citation over all citations
 }
 \examples{
 art_test=get_article_most_recent_table("Zeitgeber")

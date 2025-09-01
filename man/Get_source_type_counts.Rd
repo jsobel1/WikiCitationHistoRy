@@ -2,7 +2,7 @@
 % Please edit documentation in R/WikiHistoRyfunctions.r
 \name{Get_source_type_counts}
 \alias{Get_source_type_counts}
-\title{Get Sorce Type count}
+\title{Get Source Type count}
 \usage{
 Get_source_type_counts(art_text)
 }
@@ -14,7 +14,7 @@ citation_type_count
 }
 \description{
 This function get a wikipedia article content as input
-and return the the count of a citation such as book, website,newspaper, journal
+and return the the count of a citation from the CS1 template such as book, website, newspaper, journal
 }
 \examples{
 art_test=get_article_most_recent_table("Zeitgeber")

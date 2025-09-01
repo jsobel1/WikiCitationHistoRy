@@ -18,6 +18,6 @@ and create a wipipedia creation dates table
 }
 \examples{
 
-get_category_articles_history=get_category_articles_creation(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
+category_articles_history=get_category_articles_creation(c("Zeitgeber","Advanced sleep phase disorder","Sleep deprivation"))
 
 }
