@@ -1,5 +1,7 @@
 # WikiCitationHistoRy R package
 
+[![Codecov test coverage](https://codecov.io/gh/jsobel1/WikiCitationHistoRy/branch/master/graph/badge.svg)](https://codecov.io/gh/jsobel1/WikiCitationHistoRy?branch=master)
+
 WikiCitationHistoRy was developed in order to retrieve the history and its content of any wikipedia article as timestamps, revision ID , users, article size,and article text. This package allows retrieval of all information in structured tables and provides several visualisations of the data. In addition, the package offers several options to extract citations and references, and annotate them.
 
 <img src="https://github.com/jsobel1/WikiCitationHistoRy/blob/master/img/WikiHistory_logo_V3_test.png" width="250">
